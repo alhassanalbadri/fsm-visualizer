@@ -1,6 +1,6 @@
 # FSM Visualizer
 
-Welcome to **FSM Visualizer**, a lightweight and user-friendly tool for creating and visualizing finite state machines (FSMs). Whether you're working on an LR(1) parser output or simply need a quick FSM diagram, this tool is designed to streamline your workflow without unnecessary barriers.
+Welcome to **FSM Visualizer**, a versatile tool for creating and visualizing finite state machines (FSMs). Whether you're designing complex parsers or simple state diagrams, this tool is built to enhance your workflow with ease and efficiency.
 
 ---
 
@@ -15,8 +15,7 @@ Welcome to **FSM Visualizer**, a lightweight and user-friendly tool for creating
 
 ## 🚀 Live Demo
 
-Try the tool live here: [Live Tool Link](#)  
-Check out the project on GitHub: [GitHub Repository Link](#)
+Try the tool live here: [Live Tool Link](https://alhassanalbadri.github.io/fsm-visualizer/)
 
 ---
 
@@ -25,20 +24,20 @@ Check out the project on GitHub: [GitHub Repository Link](#)
 Follow these steps to run the project locally:
 
 1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/FSM-Visualizer.git
-   cd FSM-Visualizer
-   ```
+	```bash
+	git clone https://github.com/yourusername/FSM-Visualizer.git
+	cd FSM-Visualizer
+	```
 
 2. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+	```bash
+	npm install
+	```
 
 3. **Run the Development Server**:
-   ```bash
-   npm run dev
-   ```
+	```bash
+	npm run dev
+	```
 
 4. Open your browser and navigate to `http://localhost:3000`.
 
@@ -64,11 +63,27 @@ Follow these steps to run the project locally:
 
 ---
 
-## 📝 Future Enhancements
+## 🗺 Development Roadmap
 
-- Pathfinding for complex FSMs.
-- Export functionality (e.g., JSON, PNG).
-- Advanced customization for styles and layouts.
+### Stage 1: Basic Functionality
+- [x] Implement basic pathfinding algorithm for FSMs
+- [x] Add JSON export functionality
+- [x] Add PNG export functionality
+
+### Stage 2: LR(1) Grammar Integration
+- [ ] Implement LR(1) grammar parsing
+- [ ] Visualize LR(1) parser states and transitions
+- [ ] Add support for grammar rule editing
+
+### Stage 3: User Accounts and Basic Collaboration
+- [ ] Implement user account creation and authentication
+- [ ] Add basic collaboration features (e.g., sharing FSMs)
+- [ ] Implement user-specific FSM storage
+
+### Stage 4: Advanced Collaboration & Extensibility
+- [ ] Add support for different FSM types
+- [ ] Implement undo/redo functionality
+... and more!
 
 ---
 
