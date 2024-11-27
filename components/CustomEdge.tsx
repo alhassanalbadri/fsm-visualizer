@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from 'react';
-import { EdgeProps, EdgeLabelRenderer, getBezierPath } from 'reactflow';
+import { EdgeProps, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
 
 export default function CustomEdge({
 	id,

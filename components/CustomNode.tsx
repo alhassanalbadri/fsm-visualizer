@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
+import { Handle, Position, NodeProps } from "@xyflow/react";
 
 export default function CustomNode({ data, isConnectable, selected }: NodeProps) {
-	const [label, setLabel] = useState(data.label || "New State");
+	const [label, setLabel] = useState<string>(typeof data.label === 'string' ? data.label : "New State");
 	const [isEditing, setIsEditing] = useState(false);
 	const [dimensions, setDimensions] = useState({ width: 150, height: 40 });
 
@@ -66,11 +66,16 @@ export default function CustomNode({ data, isConnectable, selected }: NodeProps)
 		<>
 			<div
 				ref={containerRef}
-				className={`px-4 py-2 rounded-md bg-white relative flex flex-col justify-center items-center ${selected ? 'border-2 border-blue-500 animate-borderPulse' : 'border-2 border-stone-400'} shadow-md transition-all duration-700 ease-in-out`}
+				className={`px-4 py-2 rounded-lg bg-white relative flex flex-col justify-center items-center 
+					${selected 
+						? 'border-2 border-blue-500 animate-borderPulse shadow-lg ring-4 ring-blue-100' 
+						: 'border-2 border-gray-200 hover:border-gray-300'} 
+					shadow-md hover:shadow-lg duration-700 ease-in-out`}
 				style={{
 					width: dimensions.width,
 					height: dimensions.height,
 					maxHeight: `${MAX_HEIGHT}px`,
+					backgroundColor: '#FFFFFF',
 				}}
 				onDoubleClick={handleDoubleClick}
 				tabIndex={0}
@@ -87,8 +92,8 @@ export default function CustomNode({ data, isConnectable, selected }: NodeProps)
 					type="target"
 					position={Position.Top}
 					isConnectable={isConnectable}
-					className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white"
-					style={{ top: '-10px', pointerEvents: "auto" }}
+					className="!w-3 !h-3 !bg-blue-500 !border-2 !border-white hover:!scale-110"
+					style={{ top: '-5px', pointerEvents: "auto" }}
 				/>
 
 				{isEditing ? (
@@ -100,7 +105,7 @@ export default function CustomNode({ data, isConnectable, selected }: NodeProps)
 							setIsEditing(false);
 							data.label = label.trim();
 						}}
-						className="w-full resize-none outline-none text-lg font-bold text-center"
+						className="w-full resize-none outline-none text-lg font-semibold text-center focus:ring-2 focus:ring-blue-200 rounded"
 						style={{
 							overflow: 'hidden',
 							height: `${MAX_CONTENT_HEIGHT}px`,
@@ -110,7 +115,7 @@ export default function CustomNode({ data, isConnectable, selected }: NodeProps)
 					/>
 				) : (
 					<div
-						className="content w-full overflow-auto text-lg font-bold text-center whitespace-pre-wrap break-words cursor-pointer"
+						className="content w-full overflow-auto text-lg font-semibold text-center whitespace-pre-wrap break-words cursor-pointer text-gray-700"
 						style={{
 							maxHeight: `${MAX_CONTENT_HEIGHT}px`,
 							lineHeight: `${LINE_HEIGHT}px`,
@@ -124,8 +129,8 @@ export default function CustomNode({ data, isConnectable, selected }: NodeProps)
 					type="source"
 					position={Position.Bottom}
 					isConnectable={isConnectable}
-					className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white"
-					style={{ bottom: '-10px', pointerEvents: "auto" }}
+					className="!w-3 !h-3 !bg-blue-500 !border-2 !border-white hover:!scale-110m"
+					style={{ bottom: '-5px', pointerEvents: "auto" }}
 				/>
 			</div>
 			<div
