@@ -67,20 +67,26 @@ Follow these steps to run the project locally:
 
 ### Stage 1: Basic Functionality
 - [x] Implement basic pathfinding algorithm for FSMs
-- [x] Add JSON export functionality
-- [x] Add PNG export functionality
+- [x] Add JSON import/export functionality
+- [x] Add PNG/SVG export functionality
+- [x] Implement clearing the canvas
+- [ ] Add support for multiple node types (e.g., start/end states).
 
 ### Stage 2: LR(1) Grammar Integration
 - [ ] Implement LR(1) grammar parsing
 - [ ] Visualize LR(1) parser states and transitions
 - [ ] Add support for grammar rule editing
 
-### Stage 3: User Accounts and Basic Collaboration
+### Stage 3: Customization & Styling
+- [ ] Allow custom colors for states
+... and more?
+
+### Stage 4: User Accounts and Basic Collaboration
 - [ ] Implement user account creation and authentication
 - [ ] Add basic collaboration features (e.g., sharing FSMs)
 - [ ] Implement user-specific FSM storage
 
-### Stage 4: Advanced Collaboration & Extensibility
+### Stage 5: Advanced Collaboration & Extensibility
 - [ ] Add support for different FSM types
 - [ ] Implement undo/redo functionality
 ... and more!
