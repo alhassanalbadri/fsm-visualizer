@@ -1,59 +1,181 @@
-import React from 'react';
+"use client";
 
-const Sidebar = () => {
-	const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
-		event.dataTransfer.setData('application/reactflow', nodeType);
-		event.dataTransfer.effectAllowed = 'move';
+import React from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardContent,
+	CardDescription,
+} from "@/components/ui/card";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Github, Linkedin, Mail } from "lucide-react";
+
+const Sidebar = ({
+	onParseGrammar,
+	onInputChange,
+	grammar,
+	parsingResult,
+}: {
+	onParseGrammar: () => void;
+	onInputChange: (type: string, value: string) => void;
+	grammar: string;
+	parsingResult: string | null;
+}) => {
+	const onDragStart = (
+		event: React.DragEvent<HTMLButtonElement>,
+		nodeType: string
+	) => {
+		event.dataTransfer.setData("application/fsmflow", nodeType);
+		event.dataTransfer.effectAllowed = "move";
 	};
 
 	return (
-		<aside className="w-64 p-4 bg-gray-100 flex flex-col justify-between h-full">
-			<div>
-				<h1 className="text-2xl font-extrabold text-gray-800 mb-6">FSMVisualizer</h1>
-				<h2 className="text-lg font-bold mb-4">Add New State</h2>
-				<div
-					className="bg-white p-2 rounded shadow cursor-move"
-					onDragStart={(event) => onDragStart(event, 'default')}
-					draggable
-				>
-					New State
-				</div>
+		<aside
+			className="fixed top-0 left-0 w-80 h-full bg-background border-r p-6 shadow-lg z-50 flex flex-col"
+			aria-label="Sidebar"
+		>
+			<div className="flex-1 overflow-y-auto">
+				<h1 className="text-2xl font-bold mb-6">FSM Visualizer</h1>
+
+				<Tabs defaultValue="add-state" className="mb-6">
+					<TabsList className="grid w-full grid-cols-2">
+						<TabsTrigger value="add-state">Add State</TabsTrigger>
+						<TabsTrigger value="parse-grammar">Parse Grammar</TabsTrigger>
+					</TabsList>
+					<TabsContent value="add-state">
+						<Card>
+							<CardHeader>
+								<CardTitle>Add New State</CardTitle>
+								<CardDescription>
+									Drag the button below to add a new state to your diagram.
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												variant="outline"
+												className="w-full cursor-move"
+												onDragStart={(event) => onDragStart(event, "default")}
+												draggable
+											>
+												Drag to Add State
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent>
+											<p>Drag this to the canvas to create a new state</p>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+							</CardContent>
+						</Card>
+					</TabsContent>
+					<TabsContent value="parse-grammar">
+						<Card>
+							<CardHeader>
+								<CardTitle>Grammar Parser</CardTitle>
+								<CardDescription>
+									Enter grammar rules to parse and visualize.
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<Textarea
+									placeholder="Enter grammar rules"
+									value={grammar}
+									onChange={(e) => onInputChange("grammar", e.target.value)}
+									className="mb-3"
+								/>
+								<Button onClick={onParseGrammar} className="w-full">
+									Parse Grammar
+								</Button>
+								{parsingResult && (
+									<div className="mt-4 p-3 bg-muted rounded-md">
+										<h3 className="text-sm font-semibold mb-2">Parsing Result</h3>
+										<pre className="text-xs whitespace-pre-wrap">
+											{parsingResult}
+										</pre>
+									</div>
+								)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+				</Tabs>
 			</div>
 
-			<div className="mt-6 border-t pt-4">
-				<h2 className="text-lg font-bold mb-2">Contact Me</h2>
-				<p className="text-sm text-gray-600 mb-4">
-					Have questions or feedback? Feel free to reach out!
-				</p>
-				<div className="flex items-center gap-4">
-					<a
-						href="mailto:alhassanraad15@gmail.com"
-						className="text-blue-600 hover:underline text-sm"
-					>
-						alhassanraad15@gmail.com
-					</a>
-
-					<a
-						href="https://github.com/alhassanalbadri/fsm-visualizer"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-gray-800 hover:text-gray-600"
-						aria-label="GitHub"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="currentColor"
-							className="w-6 h-6"
-						>
-							<path
-								fillRule="evenodd"
-								d="M12 2a10 10 0 00-3.16 19.48c.5.09.68-.22.68-.48v-1.7c-2.77.6-3.36-1.33-3.36-1.33-.45-1.13-1.1-1.43-1.1-1.43-.9-.62.07-.6.07-.6 1 .08 1.53 1.03 1.53 1.03.88 1.5 2.32 1.07 2.88.82.09-.64.35-1.07.63-1.31-2.22-.25-4.56-1.11-4.56-4.93 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.47 9.47 0 0112 6.8c.85.004 1.7.114 2.5.336 1.9-1.3 2.74-1.02 2.74-1.02.55 1.37.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.83-2.35 4.68-4.58 4.92.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z"
-								clipRule="evenodd"
-							/>
-						</svg>
-					</a>
-				</div>
+			<div className="absolute bottom-0 left-0 w-full p-6 bg-background border-t">
+				<Card>
+					<CardHeader>
+						<CardTitle>Contact Me</CardTitle>
+						<CardDescription>
+							Have questions or feedback? Feel free to reach out!
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="flex justify-center items-center space-x-6">
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<a
+											href="https://github.com/alhassanalbadri/fsm-visualizer"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-muted-foreground hover:text-primary"
+										>
+											<Github className="h-6 w-6" />
+										</a>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>View project on GitHub</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<a
+											href="https://www.linkedin.com/in/alhassan-albadri/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-muted-foreground hover:text-primary"
+										>
+											<Linkedin className="h-6 w-6" />
+										</a>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Connect on LinkedIn</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<a
+											href="mailto:alhassanraad15@gmail.com"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-muted-foreground hover:text-primary"
+										>
+											<Mail className="h-6 w-6" />
+										</a>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Send an email</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
+					</CardContent>
+				</Card>
 			</div>
 		</aside>
 	);

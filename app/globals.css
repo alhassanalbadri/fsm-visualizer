@@ -78,3 +78,17 @@ body {
 		@apply bg-background text-foreground;
 	}
 }
+
+
+.canvas-background {
+	background-color: #f3f4f6;
+	/* Light gray background */
+	background-image:
+		linear-gradient(to right, #d1d5db 1px, transparent 1px),
+		linear-gradient(to bottom, #d1d5db 1px, transparent 1px);
+	/* Grid size */
+	background-size: 20px 20px;
+	/* Dark gray border */
+	border: 0.5px solid #9ca3af;
+	position: relative;
+}
