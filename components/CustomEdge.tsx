@@ -19,7 +19,6 @@ interface Edge {
 	type: string;
 	data: {
 		label: string;
-		// eslint-disable-next-line no-unused-vars
 		onLabelChange: (id: string, newLabel: string) => void;
 	};
 }
@@ -33,9 +32,7 @@ interface CustomEdgeProps {
 		targetY: number;
 	};
 	nodes?: Node[];
-	// eslint-disable-next-line no-unused-vars
 	onDeleteEdge?: (id: string) => void;
-	// eslint-disable-next-line no-unused-vars
 	setSelectedEdgeId: (id: string | null) => void;
 	selectedEdgeId: string | null;
 }

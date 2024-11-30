@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
 import { Save, RotateCcw, Trash2, MoreHorizontal } from 'lucide-react';
 import { useState, useRef } from 'react';
 

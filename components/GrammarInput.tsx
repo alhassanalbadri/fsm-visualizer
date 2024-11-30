@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 interface GrammarInputProps {
-	// eslint-disable-next-line no-unused-vars
 	onParse: (grammarRules: string[]) => void;
 }
 

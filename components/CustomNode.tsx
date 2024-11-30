@@ -113,7 +113,6 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 		}, [label]);
 
 		useEffect(() => {
-			// eslint-disable-next-line no-param-reassign
 			data.isEditing = isEditing;
 			if (isEditing && textAreaRef.current) {
 				textAreaRef.current.focus();
@@ -275,7 +274,6 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 						onKeyDown={ handleKeyDown }
 					/>
 				) : (
-					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
 						className="content w-full overflow-hidden text-lg font-semibold text-center whitespace-pre-wrap break-words cursor-pointer"
 						style={ {
@@ -311,7 +309,6 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 
 				{ /* Output Handle - Bottom-Center */ }
 				{ isConnectable && (
-					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
 						ref={ outputHandleRef }
 						className={ `handle handle-source absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 border-2 border-white rounded-full cursor-pointer ${isConnectionSource ? 'bg-red-500' : 'bg-blue-500'

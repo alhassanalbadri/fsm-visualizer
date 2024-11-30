@@ -36,7 +36,6 @@ interface Edge {
 	type: string;
 	data: {
 		label: string;
-		// eslint-disable-next-line no-unused-vars
 		onLabelChange: (id: string, newLabel: string) => void;
 	};
 }
