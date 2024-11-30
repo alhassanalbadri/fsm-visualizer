@@ -32,6 +32,9 @@ interface CustomEdgeProps {
 		targetY: number;
 	};
 	nodes?: Node[];
+	onDeleteEdge?: (id: string) => void;
+	setSelectedEdgeId: (id: string | null) => void;
+	selectedEdgeId: string | null;
 }
 
 interface Node {
@@ -43,9 +46,18 @@ interface Node {
 	height: number;
 }
 
-const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
+const CustomEdge: React.FC<CustomEdgeProps> = ({
+	edge,
+	path,
+	nodes,
+	onDeleteEdge,
+	setSelectedEdgeId,
+	selectedEdgeId,
+}) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const label = edge?.data?.label || "";
+
+	const isSelected = edge?.id === selectedEdgeId;
 
 	const textRef = useRef<SVGTextElement>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -75,7 +87,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 				"http://www.w3.org/2000/svg",
 				"path"
 			);
-			pathElement.setAttribute("d", "M0,0 L6,3 L0,6 Z"); // Triangle shape
+			pathElement.setAttribute("d", "M0,0 L6,3 L0,6 Z");
 			pathElement.setAttribute("fill", "#b1b1b7");
 			pathElement.setAttribute("stroke", "none");
 
@@ -145,6 +157,29 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 		[]
 	);
 
+	const handleEdgeClick = useCallback(
+		(event: React.MouseEvent) => {
+			event.stopPropagation();
+			if (edge?.id !== selectedEdgeId) {
+				setSelectedEdgeId(edge?.id || null);
+			} else if(edge?.id === selectedEdgeId) {
+				setSelectedEdgeId(null);
+			}
+		},
+		[edge, selectedEdgeId, setSelectedEdgeId]
+	);
+
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (isSelected && (event.key === "Delete" || event.key === "Backspace") && edge && !isEditing) {
+				onDeleteEdge?.(edge.id);
+				setSelectedEdgeId(null);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [isSelected, edge, onDeleteEdge, setSelectedEdgeId]);
+
 	let sourceX, sourceY, targetX, targetY;
 
 	if (edge && nodes) {
@@ -152,11 +187,8 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 		const targetNode = nodes.find((n) => n.id === edge.target);
 		if (!sourceNode || !targetNode) return null;
 
-		// Source port (bottom-center)
 		sourceX = sourceNode.position.x + sourceNode.width / 2;
 		sourceY = sourceNode.position.y + sourceNode.height;
-
-		// Target port (top-center)
 		targetX = targetNode.position.x + targetNode.width / 2;
 		targetY = targetNode.position.y;
 	} else if (path) {
@@ -169,31 +201,28 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 	}
 
 	const isSelfConnection = edge ? edge.source === edge.target : false;
+
 	const calculatePathData = () => {
 		if (isSelfConnection && edge) {
 			const node = nodes?.find((n) => n.id === edge.source);
 			if (!node) return { pathData: "", labelX: 0, labelY: 0 };
 
-			// Dynamically calculate radii based on node dimensions with scaling factors
-			const RADIUS_SCALE_X = 0.4; // Horizontal scaling factor
-			const RADIUS_SCALE_Y = 0.9; // Vertical scaling factor
-			const PADDING = 15; // Extra padding for aesthetics
+			const RADIUS_SCALE_X = 0.4;
+			const RADIUS_SCALE_Y = 0.9;
+			const PADDING = 15;
 
 			const radiusX = node.width * RADIUS_SCALE_X + PADDING;
 			const radiusY = node.height * RADIUS_SCALE_Y + PADDING;
-
 
 			const pathData = `
 				M ${sourceX} ${sourceY}
 				A ${radiusX} ${radiusY} 0 1 1 ${targetX} ${targetY}`;
 
-			// Position the label above the loop, offset by radii
-			const labelX = sourceX - radiusX - 10; // Adjust for visual centering
+			const labelX = sourceX - radiusX - 10;
 			const labelY = sourceY - radiusY - 20;
 
 			return { pathData, labelX, labelY };
 		} else {
-			// Normal edge handling with Bezier curve
 			const deltaY = targetY - sourceY;
 			const controlPointOffset = Math.min(100, Math.abs(deltaY) / 2);
 
@@ -205,7 +234,6 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 
 			const pathData = `M ${sourceX} ${sourceY} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${targetX} ${targetY}`;
 
-			// Label position: midpoint of the curve
 			const labelX = (sourceX + targetX) / 2;
 			const labelY = (sourceY + targetY) / 2 - 20;
 
@@ -222,20 +250,31 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 		width: "100%",
 		height: "100%",
 		pointerEvents: "none",
-		zIndex: isSelfConnection ? 2 : 1, // Higher z-index for self-connections
+		zIndex: isSelfConnection ? 2 : 1,
 	};
 
 	return (
 		<svg style={svgStyle} xmlns="http://www.w3.org/2000/svg" className="edge-container">
-			{/* Edge Path */}
+			{/* Invisible hitbox for selection */}
 			<path
 				d={pathData}
-				stroke="#b1b1b7"
+				stroke="transparent"
+				strokeWidth={10}
+				fill="none"
+				style={{ pointerEvents: "stroke", cursor: "pointer" }}
+				onClick={handleEdgeClick}
+			/>
+
+			 {/* Highlight edge when selected */}
+			<path
+				d={pathData}
+				stroke={isSelected ? "#ff5c5c" : "#b1b1b7"}
 				strokeWidth={2}
 				fill="none"
 				markerEnd="url(#arrowhead-marker)"
 				strokeLinecap="round"
 				strokeLinejoin="round"
+				style={{ cursor: isSelected ? "pointer" : "default" }}
 			/>
 
 			{/* Edge Label */}
@@ -243,14 +282,13 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 				<g
 					style={{ pointerEvents: "auto" }}
 					transform={`translate(${labelX}, ${labelY})`}
-					onClick={handleLabelClick}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") handleLabelClick(e);
+					onClick={(e) => {
+						handleEdgeClick(e);
+						handleLabelClick(e);
 					}}
 					role="button"
 					tabIndex={0}
 				>
-					{/* Background Rectangle */}
 					<rect
 						x={-labelDimensions.width / 2 - LABEL_PADDING}
 						y={-labelDimensions.height / 2 - LABEL_PADDING}
@@ -259,10 +297,9 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 						fill="rgba(255, 255, 255, 0.9)"
 						rx="6"
 						ry="6"
-						stroke="#b1b1b7"
+						stroke={isSelected ? "#ff5c5c" : "#b1b1b7"}
 						strokeWidth="1"
 					/>
-					{/* Label Content */}
 					{!isEditing && (
 						<text
 							ref={textRef}
@@ -280,7 +317,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({ edge, path, nodes }) => {
 								whiteSpace: "nowrap",
 							}}
 						>
-							{label || "Add label"}
+							{label}
 						</text>
 					)}
 					{isEditing && (

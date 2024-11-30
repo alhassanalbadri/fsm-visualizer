@@ -194,9 +194,9 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 				className={`node-container px-4 py-2 rounded-lg relative flex flex-col justify-center items-center ${isEditing
 					? "border-2 border-green-500 shadow-lg"
 					: selected
-						? "border-2 border-blue-500 shadow-lg"
+						? "border-2 border-blue-500 shadow-lg animate-borderPulse"
 						: "border-2 border-gray-300"
-					} bg-white shadow-md transition-all duration-200 ease-in-out hover:shadow-xl cursor-pointer`}
+					} bg-white shadow-md transition-all duration-700 ease-in-out hover:shadow-xl cursor-pointer`}
 				style={{
 					width: dimensions.width,
 					height: dimensions.height,

@@ -10,6 +10,7 @@ import { toPng, toSvg } from "html-to-image";
 import { calculatePortPosition } from "../app/utils/calculatePortPosition";
 import { Grammar } from "./parser";
 import CustomEdge from "./CustomEdge";
+import FlowControl from "./FlowControl";
 
 interface Node {
 	id: string;
@@ -57,10 +58,7 @@ const initialNodes: Node[] = [
 	},
 ];
 
-console.log(initialNodes[0].position)
-
 const initialEdges: Edge[] = [];
-
 
 const FlowEditor = () => {
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
@@ -84,7 +82,6 @@ const FlowEditor = () => {
 	const [parsingResult, setParsingResult] = useState<string>("");
 
 	const exportRef = useRef<HTMLDivElement>(null);
-	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { toast } = useToast();
 
 	const selectedNodeRef = useRef<string | null>(selectedNode);
@@ -93,7 +90,9 @@ const FlowEditor = () => {
 	const isDraggingRef = useRef<boolean>(false);
 	const dragRAFRef = useRef<number | null>(null);
 
+	// TODO: Maybe use this as an indicator somewhere in the UI, not just in the beforeunload event.
 	const [isSaved, setIsSaved] = useState<boolean>(true);
+	const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
 
 	// Update refs when state changes
 	useEffect(() => {
@@ -396,24 +395,12 @@ const FlowEditor = () => {
 		setIsSaved(true);
 	}, [nodes, edges, toast]);
 
-	const restoreFlow = useCallback(
-		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const file = event.target.files?.[0];
-			if (!file) return;
-
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				try {
-					const flow = JSON.parse(e.target?.result as string);
-					setNodes(flow.nodes || []);
-					setEdges(flow.edges || []);
-					toast({ title: "Flow Restored", description: "Your flow has been restored." });
-					setIsSaved(true);
-				} catch {
-					toast({ title: "Error", description: "Invalid file format.", variant: "destructive" });
-				}
-			};
-			reader.readAsText(file);
+	const onRestore = useCallback(
+		(flow: { nodes: Node[]; edges: Edge[] }) => {
+			setNodes(flow.nodes);
+			setEdges(flow.edges);
+			toast({ title: "Flow Restored", description: "Your flow has been restored." });
+			setIsSaved(true);
 		},
 		[toast]
 	);
@@ -654,6 +641,11 @@ const FlowEditor = () => {
 		}
 	}, [grammar, onEdgeLabelChange, toast]);
 
+	const onDeleteEdge = useCallback((id: string) => {
+		setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== id));
+		setIsSaved(false);
+	}, []);
+
 	// Recompute all edges whenever nodes change (positions or dimensions)
 	useEffect(() => {
 		const updatedEdges = edges.map((edge) => {
@@ -745,7 +737,7 @@ const FlowEditor = () => {
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 			if (!isSaved && (nodes.length > 0 || edges.length > 0)) {
 				e.preventDefault();
-				e.returnValue = ""; // Chrome requires returnValue to be set
+				return "You have unsaved changes. Are you sure you want to leave?";
 			}
 		};
 
@@ -755,10 +747,6 @@ const FlowEditor = () => {
 			window.removeEventListener("beforeunload", handleBeforeUnload);
 		};
 	}, [isSaved, nodes, edges]);
-
-	const handleRestoreClick = () => {
-		fileInputRef.current?.click();
-	};
 
 	return (
 		<div className="flex h-screen">
@@ -816,11 +804,11 @@ const FlowEditor = () => {
 
 						{/* Render Existing Edges */}
 						{edges.map((edge) => (
-							<CustomEdge key={edge.id} edge={edge} nodes={nodes} />
+							<CustomEdge key={edge.id} edge={edge} nodes={nodes} selectedEdgeId={selectedEdgeId} setSelectedEdgeId={setSelectedEdgeId} onDeleteEdge={onDeleteEdge} />
 						))}
 
 						{/* Render Dragged Edge */}
-						{draggedEdge && <CustomEdge path={draggedEdge} />}
+						{draggedEdge && <CustomEdge path={draggedEdge} selectedEdgeId={selectedEdgeId} setSelectedEdgeId={setSelectedEdgeId} onDeleteEdge={onDeleteEdge} />}
 					</svg>
 
 					{/* Render Nodes */}
@@ -856,20 +844,12 @@ const FlowEditor = () => {
 				</div>
 
 				{/* Controls */}
-				<div className="absolute top-4 right-4 flex gap-2">
-					<Button onClick={saveFlow}>Save</Button>
-					<Button onClick={handleRestoreClick}>Restore</Button>
-					<input
-						type="file"
-						ref={fileInputRef}
-						onChange={restoreFlow}
-						className="hidden"
-						accept="application/json"
-					/>
-					<Button onClick={clearCanvas}>Clear</Button>
-					<Button onClick={() => exportAsImage("png")}>Export as PNG</Button>
-					<Button onClick={() => exportAsImage("svg")}>Export as SVG</Button>
-				</div>
+				<FlowControl
+					saveFlow={saveFlow}
+					clearCanvas={clearCanvas}
+					exportAsImage={exportAsImage}
+					onRestore={onRestore}
+				/>
 			</div>
 		</div>
 	);
