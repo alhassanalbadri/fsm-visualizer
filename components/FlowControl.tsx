@@ -1,53 +1,56 @@
-import { useState, useRef } from 'react'
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Save, RotateCcw, Trash2, Download, MoreHorizontal } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+import { Save, RotateCcw, Trash2, MoreHorizontal } from 'lucide-react';
+import { useState, useRef } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 interface StyledFlowControlsProps {
 	saveFlow: () => void;
 	onRestore: (flow: { nodes: any[], edges: any[] }) => void;
 	clearCanvas: () => void;
-	exportAsImage: (type: "png" | "svg") => void;
+	exportAsImage: (type: 'png' | 'svg') => void;
 }
 
 export default function StyledFlowControls({ saveFlow, onRestore, clearCanvas, exportAsImage }: StyledFlowControlsProps) {
 	const { toast } = useToast();
-	const [isOpen, setIsOpen] = useState(false)
-	const fileInputRef = useRef<HTMLInputElement>(null)
+	const [isOpen, setIsOpen] = useState(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleRestoreClick = () => {
-		fileInputRef.current?.click()
-	}
+		fileInputRef.current?.click();
+	};
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0]
-		if (!file) return
+		const file = event.target.files?.[0];
+		if (!file) {return;}
 
-		const reader = new FileReader()
+		const reader = new FileReader();
 		reader.onload = (e) => {
 			try {
-				const flow = JSON.parse(e.target?.result as string)
-				onRestore(flow)
+				const flow = JSON.parse(e.target?.result as string);
+				onRestore(flow);
 			} catch (error) {
-				console.error("Error parsing file:", error)
+				console.error('Error parsing file:', error);
 				toast({
-					title: "Error",
-					description: "The file you uploaded is not a valid flow file.",
-					variant: "destructive"
-				})
+					title: 'Error',
+					description: 'The file you uploaded is not a valid flow file.',
+					variant: 'destructive',
+				});
 			}
-		}
-		reader.readAsText(file)
-	}
+		};
+		reader.readAsText(file);
+	};
 
 	return (
 		<TooltipProvider>
 			<div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-1 bg-primary text-primary-foreground rounded-full shadow-lg p-1">
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button size="icon" variant="ghost" className="rounded-full hover:bg-primary-foreground hover:text-primary" onClick={saveFlow}>
+						<Button size="icon" variant="ghost" className="rounded-full hover:bg-primary-foreground hover:text-primary" onClick={ saveFlow }>
 							<Save className="h-4 w-4" />
 						</Button>
 					</TooltipTrigger>
@@ -56,7 +59,7 @@ export default function StyledFlowControls({ saveFlow, onRestore, clearCanvas, e
 
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button size="icon" variant="ghost" className="rounded-full hover:bg-primary-foreground hover:text-primary" onClick={handleRestoreClick}>
+						<Button size="icon" variant="ghost" className="rounded-full hover:bg-primary-foreground hover:text-primary" onClick={ handleRestoreClick }>
 							<RotateCcw className="h-4 w-4" />
 						</Button>
 					</TooltipTrigger>
@@ -65,14 +68,14 @@ export default function StyledFlowControls({ saveFlow, onRestore, clearCanvas, e
 
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button size="icon" variant="ghost" className="rounded-full hover:bg-primary-foreground hover:text-primary" onClick={clearCanvas}>
+						<Button size="icon" variant="ghost" className="rounded-full hover:bg-primary-foreground hover:text-primary" onClick={ clearCanvas }>
 							<Trash2 className="h-4 w-4" />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Clear Canvas</TooltipContent>
 				</Tooltip>
 
-				<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+				<DropdownMenu open={ isOpen } onOpenChange={ setIsOpen }>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<DropdownMenuTrigger asChild>
@@ -84,10 +87,10 @@ export default function StyledFlowControls({ saveFlow, onRestore, clearCanvas, e
 						<TooltipContent>Export Options</TooltipContent>
 					</Tooltip>
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => exportAsImage("png")}>
+						<DropdownMenuItem onClick={ () => exportAsImage('png') }>
 							Export as PNG
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => exportAsImage("svg")}>
+						<DropdownMenuItem onClick={ () => exportAsImage('svg') }>
 							Export as SVG
 						</DropdownMenuItem>
 					</DropdownMenuContent>
@@ -95,11 +98,11 @@ export default function StyledFlowControls({ saveFlow, onRestore, clearCanvas, e
 			</div>
 			<input
 				type="file"
-				ref={fileInputRef}
+				ref={ fileInputRef }
 				className="hidden"
 				accept="application/json"
-				onChange={handleFileChange}
+				onChange={ handleFileChange }
 			/>
 		</TooltipProvider>
-	)
+	);
 }

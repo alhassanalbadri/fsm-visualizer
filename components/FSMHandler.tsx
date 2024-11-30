@@ -1,16 +1,20 @@
-"use client";
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import CustomNode from "./CustomNode";
-import Sidebar from "./Sidebar";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { toPng, toSvg } from "html-to-image";
-import { calculatePortPosition } from "../app/utils/calculatePortPosition";
-import { Grammar } from "./parser";
-import CustomEdge from "./CustomEdge";
-import FlowControl from "./FlowControl";
+import { toPng, toSvg } from 'html-to-image';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+import { useToast } from '@/hooks/use-toast';
+
+import { calculatePortPosition } from '../app/utils/calculatePortPosition';
+
+import CustomEdge from './CustomEdge';
+import CustomNode from './CustomNode';
+import FlowControl from './FlowControl';
+import { Grammar } from './parser';
+import Sidebar from './Sidebar';
 
 interface Node {
 	id: string;
@@ -32,6 +36,7 @@ interface Edge {
 	type: string;
 	data: {
 		label: string;
+		// eslint-disable-next-line no-unused-vars
 		onLabelChange: (id: string, newLabel: string) => void;
 	};
 }
@@ -46,12 +51,12 @@ const NODE_HEIGHT = 50;
 
 const initialNodes: Node[] = [
 	{
-		id: "1",
-		type: "custom",
+		id: '1',
+		type: 'custom',
 		position: { x: (CANVAS_WIDTH / 2) - (NODE_WIDTH / 2), y: (CANVAS_HEIGHT / 2) - (NODE_HEIGHT / 2) },
 		data: {
-			label: "Start",
-			isEditing: false
+			label: 'Start',
+			isEditing: false,
 		},
 		width: 150,
 		height: 50,
@@ -66,7 +71,7 @@ const FlowEditor = () => {
 	const [selectedNode, setSelectedNode] = useState<string | null>(null);
 	const [connectionStart, setConnectionStart] = useState<{
 		nodeId: string;
-		portType: "input" | "output";
+		portType: 'input' | 'output';
 		x: number;
 		y: number;
 	} | null>(null);
@@ -78,8 +83,8 @@ const FlowEditor = () => {
 	} | null>(null);
 	const [dragOffset, setDragOffset] = useState<{ offsetX: number; offsetY: number } | null>(null);
 
-	const [grammar, setGrammar] = useState<string>("");
-	const [parsingResult, setParsingResult] = useState<string>("");
+	const [grammar, setGrammar] = useState<string>('');
+	const [parsingResult, setParsingResult] = useState<string>('');
 
 	const exportRef = useRef<HTMLDivElement>(null);
 	const { toast } = useToast();
@@ -124,8 +129,8 @@ const FlowEditor = () => {
 		const handleMouseUp = () => {
 			handleCanvasMouseUp();
 		};
-		document.addEventListener("mouseup", handleMouseUp);
-		return () => document.removeEventListener("mouseup", handleMouseUp);
+		document.addEventListener('mouseup', handleMouseUp);
+		return () => document.removeEventListener('mouseup', handleMouseUp);
 	}, []);
 
 	useEffect(() => {
@@ -137,8 +142,8 @@ const FlowEditor = () => {
 				setPanStart({ x: e.clientX, y: e.clientY });
 			}
 		};
-		document.addEventListener("mousemove", handleMouseMove);
-		return () => document.removeEventListener("mousemove", handleMouseMove);
+		document.addEventListener('mousemove', handleMouseMove);
+		return () => document.removeEventListener('mousemove', handleMouseMove);
 	}, [isPanning, panStart]);
 
 	useEffect(() => {
@@ -154,11 +159,11 @@ const FlowEditor = () => {
 	// Handler for node dragging
 	const handleNodeDrag = useCallback(
 		(event: MouseEvent) => {
-			if (!isDraggingRef.current) return;
+			if (!isDraggingRef.current) { return; }
 
 			const nodeId = selectedNodeRef.current;
 			const offset = dragOffsetRef.current;
-			if (!nodeId || !offset) return;
+			if (!nodeId || !offset) { return; }
 
 			let newX = event.clientX - offset.offsetX;
 			let newY = event.clientY - offset.offsetY;
@@ -190,8 +195,8 @@ const FlowEditor = () => {
 				dragRAFRef.current = null;
 			}
 
-			window.removeEventListener("mousemove", handleNodeDrag);
-			window.removeEventListener("mouseup", handleNodeDragEnd);
+			window.removeEventListener('mousemove', handleNodeDrag);
+			window.removeEventListener('mouseup', handleNodeDragEnd);
 		}
 	}, [handleNodeDrag]);
 
@@ -216,8 +221,8 @@ const FlowEditor = () => {
 				isDraggingRef.current = true;
 
 				// Add global event listeners for smoother dragging
-				window.addEventListener("mousemove", handleNodeDrag);
-				window.addEventListener("mouseup", handleNodeDragEnd);
+				window.addEventListener('mousemove', handleNodeDrag);
+				window.addEventListener('mouseup', handleNodeDragEnd);
 			}
 		},
 		[nodes, handleNodeDrag, handleNodeDragEnd]
@@ -226,7 +231,8 @@ const FlowEditor = () => {
 	// Handle canvas drag and drop
 	const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
-		event.dataTransfer.dropEffect = "move";
+		const dt = event.dataTransfer;
+		dt.dropEffect = 'move';
 	};
 
 	const onDrop = useCallback(
@@ -234,9 +240,9 @@ const FlowEditor = () => {
 			event.preventDefault();
 
 			const reactFlowBounds = exportRef.current?.getBoundingClientRect();
-			const type = event.dataTransfer.getData("application/fsmflow");
+			const type = event.dataTransfer.getData('application/fsmflow');
 
-			if (typeof type === "string" && type && reactFlowBounds) {
+			if (typeof type === 'string' && type && reactFlowBounds) {
 				const position = {
 					x: event.clientX - reactFlowBounds.left,
 					y: event.clientY - reactFlowBounds.top,
@@ -248,11 +254,11 @@ const FlowEditor = () => {
 
 				const newNode: Node = {
 					id: uuidv4(),
-					type: "custom",
+					type: 'custom',
 					position,
 					data: {
-						label: "New State",
-						isEditing: false
+						label: 'New State',
+						isEditing: false,
 					},
 					width: 150,
 					height: 50,
@@ -270,16 +276,16 @@ const FlowEditor = () => {
 	const handleConnectionStart = useCallback(
 		(
 			nodeId: string,
-			portType: "input" | "output",
+			portType: 'input' | 'output',
 			portClientX: number,
 			portClientY: number,
 			clientX: number,
 			clientY: number
 		) => {
-			if (portType !== "output") return;
+			if (portType !== 'output') { return; }
 
 			const canvasRect = exportRef.current?.getBoundingClientRect();
-			if (!canvasRect) return;
+			if (!canvasRect) { return; }
 
 			const sourceX = portClientX - canvasRect.left;
 			const sourceY = portClientY - canvasRect.top;
@@ -316,7 +322,7 @@ const FlowEditor = () => {
 		setEdges((prevEdges) =>
 			prevEdges.map((edge) =>
 				edge.id === id
-					? { ...edge, data: { ...edge.data, label: newLabel.length === 0 ? "Add Label" : newLabel } }
+					? { ...edge, data: { ...edge.data, label: newLabel.length === 0 ? 'Add Label' : newLabel } }
 					: edge
 			)
 		);
@@ -326,7 +332,7 @@ const FlowEditor = () => {
 	// Complete a connection to a target node (Input Port - Top-Center)
 	const handleConnectionEnd = useCallback(
 		(targetNodeId: string) => {
-			if (!connectionStart) return;
+			if (!connectionStart) { return; }
 
 			const targetNode = nodes.find((node) => node.id === targetNodeId);
 			const sourceNode = nodes.find((node) => node.id === connectionStart.nodeId);
@@ -334,9 +340,9 @@ const FlowEditor = () => {
 			if (sourceNode && targetNode) {
 				if (edges.find((edge) => edge.source === sourceNode.id && edge.target === targetNode.id)) {
 					toast({
-						title: "Invalid Connection",
-						description: "Cannot create this connection.",
-						variant: "destructive",
+						title: 'Invalid Connection',
+						description: 'Cannot create this connection.',
+						variant: 'destructive',
 					});
 					setConnectionStart(null);
 					setDraggedEdge(null);
@@ -360,8 +366,8 @@ const FlowEditor = () => {
 					sourceY: sourcePort.y,
 					targetX: targetPort.x,
 					targetY: targetPort.y,
-					type: "custom",
-					data: { label: "New Edge", onLabelChange: onEdgeLabelChange },
+					type: 'custom',
+					data: { label: 'New Edge', onLabelChange: onEdgeLabelChange },
 				};
 
 				setEdges((eds) => [...eds, newEdge]);
@@ -385,13 +391,13 @@ const FlowEditor = () => {
 
 	const saveFlow = useCallback(() => {
 		const flowData = { nodes, edges };
-		const blob = new Blob([JSON.stringify(flowData, null, 2)], { type: "application/json" });
+		const blob = new Blob([JSON.stringify(flowData, null, 2)], { type: 'application/json' });
 		const url = URL.createObjectURL(blob);
-		const link = document.createElement("a");
+		const link = document.createElement('a');
 		link.href = url;
-		link.download = "flow.json";
+		link.download = 'flow.json';
 		link.click();
-		toast({ title: "Flow Saved", description: "Your flow has been saved." });
+		toast({ title: 'Flow Saved', description: 'Your flow has been saved.' });
 		setIsSaved(true);
 	}, [nodes, edges, toast]);
 
@@ -399,7 +405,7 @@ const FlowEditor = () => {
 		(flow: { nodes: Node[]; edges: Edge[] }) => {
 			setNodes(flow.nodes);
 			setEdges(flow.edges);
-			toast({ title: "Flow Restored", description: "Your flow has been restored." });
+			toast({ title: 'Flow Restored', description: 'Your flow has been restored.' });
 			setIsSaved(true);
 		},
 		[toast]
@@ -407,27 +413,27 @@ const FlowEditor = () => {
 
 	// Clear all nodes and edges
 	const clearCanvas = useCallback(() => {
-		if (window.confirm("Are you sure you want to clear the canvas?")) {
+		if (window.confirm('Are you sure you want to clear the canvas?')) {
 			setNodes([]);
 			setEdges([]);
-			toast({ title: "Canvas Cleared", description: "All nodes and edges have been removed." });
+			toast({ title: 'Canvas Cleared', description: 'All nodes and edges have been removed.' });
 			setIsSaved(false);
 		}
 	}, [toast]);
 
 	// Export canvas as an image
 	const exportAsImage = useCallback(
-		async (type: "png" | "svg") => {
-			if (!exportRef.current) return;
+		async (type: 'png' | 'svg') => {
+			if (!exportRef.current) { return; }
 
 			try {
 				const allElements = Array.from(
-					exportRef.current.querySelectorAll<HTMLElement>(".node-container, .edge-container")
+					exportRef.current.querySelectorAll<HTMLElement>('.node-container, .edge-container')
 				);
 
 				if (allElements.length === 0) {
-					console.warn("No elements found to export. Ensure nodes and edges have proper classes.");
-					toast({ title: "Error", description: "No elements to export.", variant: "destructive" });
+					console.warn('No elements found to export. Ensure nodes and edges have proper classes.');
+					toast({ title: 'Error', description: 'No elements to export.', variant: 'destructive' });
 					return;
 				}
 
@@ -462,35 +468,35 @@ const FlowEditor = () => {
 
 				const clone = exportRef.current.cloneNode(true) as HTMLElement;
 
-				clone.style.position = "absolute";
+				clone.style.position = 'absolute';
 				clone.style.top = `${-minY}px`;
 				clone.style.left = `${-minX}px`;
 
-				const tempDiv = document.createElement("div");
-				tempDiv.style.position = "absolute";
-				tempDiv.style.top = "0";
-				tempDiv.style.left = "0";
+				const tempDiv = document.createElement('div');
+				tempDiv.style.position = 'absolute';
+				tempDiv.style.top = '0';
+				tempDiv.style.left = '0';
 				tempDiv.style.width = `${width}px`;
 				tempDiv.style.height = `${height}px`;
-				tempDiv.style.overflow = "hidden";
-				tempDiv.style.background = "white";
+				tempDiv.style.overflow = 'hidden';
+				tempDiv.style.background = 'white';
 				tempDiv.appendChild(clone);
 
 				document.body.appendChild(tempDiv);
 
 				await new Promise((resolve) => requestAnimationFrame(resolve));
 
-				const dataUrl = type === "png" ? await toPng(tempDiv) : await toSvg(tempDiv);
+				const dataUrl = type === 'png' ? await toPng(tempDiv) : await toSvg(tempDiv);
 
-				const link = document.createElement("a");
+				const link = document.createElement('a');
 				link.download = `flow-diagram.${type}`;
 				link.href = dataUrl;
 				link.click();
 
 				document.body.removeChild(tempDiv);
 			} catch (error) {
-				console.error("Export Error:", error);
-				toast({ title: "Error", description: `Failed to export as ${type}.`, variant: "destructive" });
+				console.error('Export Error:', error);
+				toast({ title: 'Error', description: `Failed to export as ${type}.`, variant: 'destructive' });
 			}
 		},
 		[toast, panOffset]
@@ -512,7 +518,7 @@ const FlowEditor = () => {
 						);
 
 						setDraggedEdge((prevDraggedEdge) => {
-							if (!prevDraggedEdge) return null;
+							if (!prevDraggedEdge) { return null; }
 							if (
 								prevDraggedEdge.sourceX === sourcePort.x &&
 								prevDraggedEdge.sourceY === sourcePort.y
@@ -558,17 +564,17 @@ const FlowEditor = () => {
 			setEdges([]);
 
 			if (grammar.trim().length === 0) {
-				setParsingResult("No grammar provided");
+				setParsingResult('No grammar provided');
 				return;
 			}
 
 			setTimeout(() => {
 				let grammarRules = grammar
-					.split("\n")
+					.split('\n')
 					.map((line) => line.trim())
 					.filter((line) => line.length > 0);
 
-				grammarRules = [`$accept -> ${grammarRules[0].split(" ")[0]} $`, ...grammarRules];
+				grammarRules = [`$accept -> ${grammarRules[0].split(' ')[0]} $`, ...grammarRules];
 
 				const grammarObj = new Grammar(grammarRules);
 				grammarObj.buildAutomaton();
@@ -579,7 +585,7 @@ const FlowEditor = () => {
 				setNodes(
 					parserNodes.map((node) => {
 						const conflict = conflicts.find(
-							(conflict) => conflict.state === parseInt(node.id.split("state-")[1])
+							(c) => c.state === parseInt(node.id.split('state-')[1])
 						);
 						return {
 							...node,
@@ -601,7 +607,7 @@ const FlowEditor = () => {
 							const sourceNode = parserNodes.find((n) => n.id === edge.source);
 							const targetNode = parserNodes.find((n) => n.id === edge.target);
 
-							if (!sourceNode || !targetNode) return null;
+							if (!sourceNode || !targetNode) { return null; }
 
 							const sourcePort = calculatePortPosition(
 								{ x: sourceNode.position.x, y: sourceNode.position.y, width: sourceNode.width!, height: sourceNode.height! },
@@ -619,7 +625,7 @@ const FlowEditor = () => {
 								targetX: targetPort.x,
 								targetY: targetPort.y,
 								data: {
-									label: edge.data?.label || "Edge Label",
+									label: edge.data?.label || 'Edge Label',
 									onLabelChange: onEdgeLabelChange,
 								},
 							};
@@ -627,15 +633,15 @@ const FlowEditor = () => {
 						.filter((edge): edge is Edge => edge !== null)
 				);
 
-				setParsingResult(conflicts.length === 0 ? "Parsing Successful!" : "Conflict(s) Detected");
+				setParsingResult(conflicts.length === 0 ? 'Parsing Successful!' : 'Conflict(s) Detected');
 				setIsSaved(false);
 			}, 0);
 		} catch (error) {
-			console.error("Error parsing grammar:", error);
+			console.error('Error parsing grammar:', error);
 			toast({
-				title: "Error",
+				title: 'Error',
 				description: `Failed to parse grammar: ${(error as Error).message}`,
-				variant: "destructive",
+				variant: 'destructive',
 			});
 			setParsingResult(`Parsing Failed: ${(error as Error).message}`);
 		}
@@ -652,7 +658,7 @@ const FlowEditor = () => {
 			const sourceNode = nodes.find((n) => n.id === edge.source);
 			const targetNode = nodes.find((n) => n.id === edge.target);
 
-			if (!sourceNode || !targetNode) return edge;
+			if (!sourceNode || !targetNode) { return edge; }
 
 			const sourcePort = calculatePortPosition(
 				{ x: sourceNode.position.x, y: sourceNode.position.y, width: sourceNode.width, height: sourceNode.height },
@@ -703,7 +709,7 @@ const FlowEditor = () => {
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "Delete" || event.key === "Backspace") {
+			if (event.key === 'Delete' || event.key === 'Backspace') {
 				const findNode = nodes.find((node) => node.id === selectedNode);
 				if (selectedNode && !findNode?.data.isEditing) {
 					event.preventDefault();
@@ -718,75 +724,76 @@ const FlowEditor = () => {
 					setIsSaved(false);
 
 					toast({
-						title: "Node Deleted",
+						title: 'Node Deleted',
 						description: `Node ${selectedNode} has been deleted.`,
-						variant: "default",
+						variant: 'default',
 					});
 				}
 			}
 		};
 
-		window.addEventListener("keydown", handleKeyDown);
+		window.addEventListener('keydown', handleKeyDown);
 
 		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
+			window.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [selectedNode, toast]);
+	}, [nodes, selectedNode, toast]);
 
 	useEffect(() => {
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 			if (!isSaved && (nodes.length > 0 || edges.length > 0)) {
 				e.preventDefault();
-				return "You have unsaved changes. Are you sure you want to leave?";
+				return 'You have unsaved changes. Are you sure you want to leave?';
 			}
+			return undefined;
 		};
 
-		window.addEventListener("beforeunload", handleBeforeUnload);
+		window.addEventListener('beforeunload', handleBeforeUnload);
 
 		return () => {
-			window.removeEventListener("beforeunload", handleBeforeUnload);
+			window.removeEventListener('beforeunload', handleBeforeUnload);
 		};
 	}, [isSaved, nodes, edges]);
 
 	return (
 		<div className="flex h-screen">
 			<Sidebar
-				onInputChange={handleInputChange}
-				onParseGrammar={handleParseGrammar}
-				grammar={grammar}
-				parsingResult={parsingResult}
+				onInputChange={ handleInputChange }
+				onParseGrammar={ handleParseGrammar }
+				grammar={ grammar }
+				parsingResult={ parsingResult }
 			/>
 			<div
-				className={`flex-grow relative bg-gray-100 overflow-hidden ${isPanning ? "cursor-grabbing" : "cursor-default"
-					}`}
-				onClick={handleCanvasClick}
-				onMouseMove={handleCanvasMouseMove}
-				onDragOver={onDragOver}
-				onDrop={onDrop}
-				onMouseDown={handleCanvasMouseDown}
+				className={ `flex-grow relative bg-gray-100 overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-default'
+				}` }
+				onClick={ handleCanvasClick }
+				onMouseMove={ handleCanvasMouseMove }
+				onDragOver={ onDragOver }
+				onDrop={ onDrop }
+				onMouseDown={ handleCanvasMouseDown }
 			>
-				{/* Inner Container for Panning with exportRef */}
+				{ /* Inner Container for Panning with exportRef */ }
 				<div
-					ref={exportRef}
+					ref={ exportRef }
 					className="absolute top-0 left-0 canvas-background"
-					style={{
+					style={ {
 						transform: `translate(${panOffset.x}px, ${panOffset.y}px)`,
 						width: `${CANVAS_WIDTH}px`,
 						height: `${CANVAS_HEIGHT}px`,
-						position: "relative",
-					}}
+						position: 'relative',
+					} }
 				>
-					{/* SVG Container for Edges */}
+					{ /* SVG Container for Edges */ }
 					<svg
-						style={{
-							position: "absolute",
+						style={ {
+							position: 'absolute',
 							top: 0,
 							left: 0,
-							width: "100%",
-							height: "100%",
-							pointerEvents: "none",
+							width: '100%',
+							height: '100%',
+							pointerEvents: 'none',
 							zIndex: 1,
-						}}
+						} }
 						xmlns="http://www.w3.org/2000/svg"
 					>
 						<defs>
@@ -802,53 +809,63 @@ const FlowEditor = () => {
 							</marker>
 						</defs>
 
-						{/* Render Existing Edges */}
-						{edges.map((edge) => (
-							<CustomEdge key={edge.id} edge={edge} nodes={nodes} selectedEdgeId={selectedEdgeId} setSelectedEdgeId={setSelectedEdgeId} onDeleteEdge={onDeleteEdge} />
-						))}
+						{ /* Render Existing Edges */ }
+						{ edges.map((edge) => (
+							<CustomEdge key={ edge.id } edge={ edge } nodes={ nodes } selectedEdgeId={ selectedEdgeId } setSelectedEdgeId={ setSelectedEdgeId } onDeleteEdge={ onDeleteEdge } />
+						)) }
 
-						{/* Render Dragged Edge */}
-						{draggedEdge && <CustomEdge path={draggedEdge} selectedEdgeId={selectedEdgeId} setSelectedEdgeId={setSelectedEdgeId} onDeleteEdge={onDeleteEdge} />}
+						{ /* Render Dragged Edge */ }
+						{ draggedEdge && <CustomEdge path={ draggedEdge } selectedEdgeId={ selectedEdgeId } setSelectedEdgeId={ setSelectedEdgeId } onDeleteEdge={ onDeleteEdge } /> }
 					</svg>
 
-					{/* Render Nodes */}
-					{nodes.map((node) => (
-						<div
-							key={node.id}
-							style={{
-								position: "absolute",
+					{ /* Render Nodes */ }
+					{ nodes.map((node) => (
+						<button
+							key={ node.id }
+							style={ {
+								position: 'absolute',
 								left: node.position.x,
 								top: node.position.y,
 								width: node.width,
 								height: node.height,
-								cursor: "move",
+								cursor: 'move',
 								zIndex: 2,
-							}}
-							onMouseDown={(event) => handleNodeDragStart(event, node.id)}
+								border: 'none',
+								background: 'transparent',
+								padding: 0,
+							} }
+							onMouseDown={ (event) => handleNodeDragStart(event, node.id) }
+							onKeyDown={ (event) => {
+								if (event.key === 'Enter' || event.key === ' ') {
+									event.preventDefault();
+									handleNodeDragStart(event as unknown as React.MouseEvent, node.id);
+								}
+							} }
+							aria-label={ `Draggable node: ${node.data.label}` }
 						>
 							<CustomNode
-								id={node.id}
-								data={node.data}
-								isConnectable={true}
-								selected={selectedNode === node.id}
-								onSelect={handleSelectNode}
-								onConnectStart={handleConnectionStart}
-								onConnectEnd={handleConnectionEnd}
-								isCreatingConnection={!!connectionStart}
-								isConnectionSource={connectionStart?.nodeId === node.id}
-								onResize={handleNodeResize}
-								onLabelChange={handleNodeLabelChange}
+								id={ node.id }
+								data={ node.data }
+								isConnectable
+								selected={ selectedNode === node.id }
+								onSelect={ handleSelectNode }
+								onConnectStart={ handleConnectionStart }
+								onConnectEnd={ handleConnectionEnd }
+								isCreatingConnection={ !!connectionStart }
+								isConnectionSource={ connectionStart?.nodeId === node.id }
+								onResize={ handleNodeResize }
+								onLabelChange={ handleNodeLabelChange }
 							/>
-						</div>
-					))}
+						</button>
+					)) }
 				</div>
 
-				{/* Controls */}
+				{ /* Controls */ }
 				<FlowControl
-					saveFlow={saveFlow}
-					clearCanvas={clearCanvas}
-					exportAsImage={exportAsImage}
-					onRestore={onRestore}
+					saveFlow={ saveFlow }
+					clearCanvas={ clearCanvas }
+					exportAsImage={ exportAsImage }
+					onRestore={ onRestore }
 				/>
 			</div>
 		</div>

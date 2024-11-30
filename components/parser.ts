@@ -25,8 +25,8 @@ class Item {
 
 	toString(): string {
 		const rhsWithDot = [...this.rule.rhs];
-		rhsWithDot.splice(this.dot, 0, "↑");
-		return `${this.rule.lhs} → ${rhsWithDot.join(" ")}`;
+		rhsWithDot.splice(this.dot, 0, '↑');
+		return `${this.rule.lhs} → ${rhsWithDot.join(' ')}`;
 	}
 
 	equals(other: Item): boolean {
@@ -51,7 +51,7 @@ class State {
 	}
 
 	equals(other: State): boolean {
-		if (this.items.size !== other.items.size) return false;
+		if (this.items.size !== other.items.size) {return false;}
 		for (const item of this.items) {
 			let found = false;
 			for (const otherItem of other.items) {
@@ -60,7 +60,7 @@ class State {
 					break;
 				}
 			}
-			if (!found) return false;
+			if (!found) {return false;}
 		}
 		return true;
 	}
@@ -68,7 +68,7 @@ class State {
 	display(): void {
 		for (const item of this.items) {
 			const rhsWithDot = [...item.rule.rhs];
-			rhsWithDot.splice(item.dot, 0, "↑");
+			rhsWithDot.splice(item.dot, 0, '↑');
 		}
 	}
 }
@@ -90,7 +90,7 @@ class Grammar {
 
 	constructor(rules: string[]) {
 		if (rules.length === 0) {
-			throw new Error("At least one rule must be provided.");
+			throw new Error('At least one rule must be provided.');
 		}
 
 		this.rules = this.parseRules(rules);
@@ -108,7 +108,7 @@ class Grammar {
 
 	private parseRules(rules: string[]): Rule[] {
 		return rules.map(ruleStr => {
-			const [lhs, rhs] = ruleStr.split("->").map(part => part.trim());
+			const [lhs, rhs] = ruleStr.split('->').map(part => part.trim());
 			if (!lhs || !rhs) {
 				throw new Error(`Invalid rule format: "${ruleStr}". Expected format "A → B C".`);
 			}
@@ -163,7 +163,7 @@ class Grammar {
 				while (i < rhs.length && nullable) {
 					const sym = rhs[i];
 					const symFirst = this.firstSets.get(sym);
-					if (!symFirst) break; // Should not happen
+					if (!symFirst) {break;} // Should not happen
 
 					const beforeSize = firstSet.size;
 					for (const token of symFirst) {
@@ -213,7 +213,7 @@ class Grammar {
 
 				for (let i = 0; i < rhs.length; i++) {
 					const B = rhs[i];
-					if (!this.nonTerminals.has(B)) continue;
+					if (!this.nonTerminals.has(B)) {continue;}
 
 					const followB = this.followSets.get(B)!;
 
@@ -223,7 +223,7 @@ class Grammar {
 					while (j < rhs.length && nullable) {
 						const C = rhs[j];
 						const firstC = this.firstSets.get(C);
-						if (!firstC) break;
+						if (!firstC) {break;}
 
 						const beforeSize = followB.size;
 						for (const token of firstC) {
@@ -352,14 +352,14 @@ class Grammar {
 				}
 
 				// Determine action type
-				const actionType = this.terminals.has(symbol) ? "shift" : "goto";
+				const actionType = this.terminals.has(symbol) ? 'shift' : 'goto';
 
 				// Record the transition
 				this.transitions.push({
 					from: currentIndex,
 					to: existingStateIndex,
 					symbol: symbol,
-					action: actionType
+					action: actionType,
 				});
 			}
 		}
@@ -368,14 +368,14 @@ class Grammar {
 		for (let i = 0; i < this.states.length; i++) {
 			for (const item of this.states[i].items) {
 				if (
-					item.rule.lhs === "$accept" &&
+					item.rule.lhs === '$accept' &&
 					item.dot === item.rule.rhs.length
 				) {
 					this.acceptState = i;
 					break;
 				}
 			}
-			if (this.acceptState !== null) break;
+			if (this.acceptState !== null) {break;}
 		}
 	}
 
@@ -383,7 +383,7 @@ class Grammar {
 	 * Computes the intersection of multiple sets.
 	 */
 	private setIntersection(sets: Set<Token>[]): Set<Token> {
-		if (sets.length === 0) return new Set();
+		if (sets.length === 0) {return new Set();}
 		let intersection = new Set(sets[0]);
 		for (const s of sets.slice(1)) {
 			intersection = new Set([...intersection].filter(x => s.has(x)));
@@ -414,7 +414,7 @@ class Grammar {
 						rule.rhs.every((sym, idx) => sym === item.rule.rhs[idx])
 					);
 
-					if (item.rule.lhs === "$accept") {
+					if (item.rule.lhs === '$accept') {
 						// Accept action
 						// For simplicity, not handling accept action as a conflict
 						continue;
@@ -434,7 +434,7 @@ class Grammar {
 					const nextSymbol = item.rule.rhs[item.dot];
 					if (this.terminals.has(nextSymbol)) {
 						// Shift action
-						const transition = this.transitions.find(t => t.from === i && t.symbol === nextSymbol && t.action === "shift");
+						const transition = this.transitions.find(t => t.from === i && t.symbol === nextSymbol && t.action === 'shift');
 						if (transition) {
 							shiftActions.set(nextSymbol, transition.to);
 						}
@@ -460,7 +460,7 @@ class Grammar {
 							type: 'shift/reduce',
 							symbol: symbol,
 							rules: [...intersectingRules],
-							intersection: [symbol]
+							intersection: [symbol],
 						});
 					}
 				}
@@ -483,7 +483,7 @@ class Grammar {
 							type: 'reduce/reduce',
 							symbol: symbol,
 							rules: [...reducingRuleIndices],
-							intersection: Array.from(intersectionSet)
+							intersection: Array.from(intersectionSet),
 						});
 					}
 				}
@@ -508,10 +508,10 @@ class Grammar {
 		while (queue.length > 0) {
 			const { id, layer } = queue.shift()!;
 
-			if (visited.has(id)) continue;
+			if (visited.has(id)) {continue;}
 			visited.add(id);
 
-			if (!layers[layer]) layers[layer] = [];
+			if (!layers[layer]) {layers[layer] = [];}
 			layers[layer].push(id);
 
 			this.transitions
@@ -547,17 +547,17 @@ class Grammar {
 			layer.forEach((stateIndex, nodeIndex) => {
 				const label = Array.from(this.states[stateIndex].items)
 					.map((item) => item.toString())
-					.join("\n");
+					.join('\n');
 
 				nodes.push({
 					id: `state-${stateIndex}`,
-					type: "custom",
+					type: 'custom',
 					position: {
 						x: startX + nodeIndex * NODE_SPACING_X,
 						y: initialYOffset + layerIndex * NODE_SPACING_Y,
 					},
 					data: {
-						label: label || "New State", // Provide a default label if empty
+						label: label || 'New State', // Provide a default label if empty
 					},
 				});
 			});
@@ -569,7 +569,7 @@ class Grammar {
 			source: `state-${transition.from}`,
 			target: `state-${transition.to}`,
 			data: { label: transition.symbol },
-			type: "custom",
+			type: 'custom',
 		}));
 
 		return { nodes, edges };

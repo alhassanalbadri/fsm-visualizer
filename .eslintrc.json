@@ -1,3 +1,176 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+	"extends": [
+		"next/core-web-vitals",
+		"next/typescript"
+	],
+	"rules": {
+		// Code Style
+		"semi": [
+			"error",
+			"always"
+		], // Require semicolons
+		"quotes": [
+			"error",
+			"single",
+			{
+				"avoidEscape": true
+			}
+		], // Prefer single quotes
+		"indent": [
+			"error",
+			"tab"
+		], // Use tabs for indentation
+		"no-trailing-spaces": "error", // Disallow trailing spaces
+		"eol-last": [
+			"error",
+			"always"
+		], // Require newline at the end of files
+		"comma-dangle": [
+			"error",
+			"always-multiline"
+		], // Require dangling commas for multiline
+		"object-curly-spacing": [
+			"error",
+			"always"
+		], // Require spaces inside curly braces
+		"array-bracket-spacing": [
+			"error",
+			"never"
+		], // Disallow spaces inside array brackets
+		// Best Practices
+		"eqeqeq": [
+			"error",
+			"always"
+		], // Require strict equality
+		"no-console": [
+			"warn",
+			{
+				"allow": [
+					"warn",
+					"error"
+				]
+			}
+		], // Warn about console.logs but allow warn and error
+		"no-debugger": "error", // Disallow debugger
+		"curly": [
+			"error",
+			"all"
+		], // Require braces for all control statements
+		"no-param-reassign": [
+			"error",
+			{
+				"props": true
+			}
+		], // Disallow parameter reassignment
+		"consistent-return": "error", // Enforce consistent return statements
+		// Variables
+		"no-unused-vars": [
+			"warn",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_"
+			}
+		], // Ignore unused variables starting with _
+		"no-shadow": "error", // Disallow variable shadowing
+		"no-var": "error", // Disallow var in favor of let/const
+		"prefer-const": "error", // Prefer const when variables are not reassigned
+		"no-underscore-dangle": [
+			"error",
+			{
+				"allow": [
+					"_id",
+					"_t"
+				]
+			}
+		], // Allow specific underscores (e.g., MongoDB fields)
+		// Functions
+		"arrow-body-style": [
+			"error",
+			"as-needed"
+		], // Enforce concise arrow function bodies
+		"func-names": [
+			"error",
+			"as-needed"
+		], // Require named functions only when needed
+		"no-unused-expressions": "error", // Disallow unused expressions
+		"prefer-arrow-callback": "error", // Prefer arrow functions as callbacks
+		// React/Next.js
+		"react/jsx-uses-react": "off", // Not required in React 17+
+		"react/react-in-jsx-scope": "off", // Not required in Next.js
+		"react/jsx-boolean-value": [
+			"error",
+			"never"
+		], // Omit boolean values in props
+		"react/jsx-curly-spacing": [
+			"error",
+			{
+				"when": "always",
+				"children": true
+			}
+		], // Require spacing in JSX curly braces
+		"react/self-closing-comp": "error", // Enforce self-closing tags when no children
+		"react/no-array-index-key": "warn", // Warn about using array index as key
+		"react/prop-types": "off", // Disable prop-types since you're using TypeScript
+		// Imports
+		"import/order": [
+			"error",
+			{
+				"groups": [
+					"builtin",
+					"external",
+					"internal",
+					"parent",
+					"sibling",
+					"index",
+					"object"
+				],
+				"newlines-between": "always",
+				"alphabetize": {
+					"order": "asc",
+					"caseInsensitive": true
+				}
+			}
+		], // Enforce sorted imports
+		"import/no-duplicates": "error", // Disallow duplicate imports
+		"import/prefer-default-export": "off", // Allow single named exports
+		"import/extensions": [
+			"error",
+			"never",
+			{
+				"json": "always"
+			}
+		], // Disallow file extensions except for JSON
+		// TypeScript Specific
+		"@typescript-eslint/no-unused-vars": [
+			"warn",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_"
+			}
+		], // Ignore unused variables starting with _
+		"@typescript-eslint/explicit-module-boundary-types": "off", // Disable forcing return type definitions
+		"@typescript-eslint/no-explicit-any": "warn", // Warn against using `any`
+		"@typescript-eslint/no-inferrable-types": "off", // Allow explicit types even if inferred
+		"@typescript-eslint/consistent-type-imports": "error", // Enforce consistent type imports
+		// Accessibility
+		"jsx-a11y/anchor-is-valid": [
+			"error",
+			{
+				"components": [
+					"Link"
+				],
+				"specialLink": [
+					"hrefLeft",
+					"hrefRight"
+				],
+				"aspects": [
+					"invalidHref",
+					"preferButton"
+				]
+			}
+		], // Ensure <a> tags are valid
+		"jsx-a11y/alt-text": "error", // Enforce alt text on media elements
+		"jsx-a11y/no-static-element-interactions": "warn", // Warn against clickable non-interactive elements
+		"jsx-a11y/click-events-have-key-events": "warn" // Warn if click events lack key event equivalents
+	}
 }

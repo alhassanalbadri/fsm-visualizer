@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
 	useState,
@@ -6,7 +6,7 @@ import React, {
 	useEffect,
 	useRef,
 	useLayoutEffect,
-} from "react";
+} from 'react';
 
 interface Edge {
 	id: string;
@@ -19,6 +19,7 @@ interface Edge {
 	type: string;
 	data: {
 		label: string;
+		// eslint-disable-next-line no-unused-vars
 		onLabelChange: (id: string, newLabel: string) => void;
 	};
 }
@@ -32,7 +33,9 @@ interface CustomEdgeProps {
 		targetY: number;
 	};
 	nodes?: Node[];
+	// eslint-disable-next-line no-unused-vars
 	onDeleteEdge?: (id: string) => void;
+	// eslint-disable-next-line no-unused-vars
 	setSelectedEdgeId: (id: string | null) => void;
 	selectedEdgeId: string | null;
 }
@@ -55,7 +58,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	selectedEdgeId,
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const label = edge?.data?.label || "";
+	const label = edge?.data?.label || '';
 
 	const isSelected = edge?.id === selectedEdgeId;
 
@@ -70,34 +73,34 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	const labelWidthRef = useRef<number>(0);
 
 	useEffect(() => {
-		const markerId = "arrowhead-marker";
+		const markerId = 'arrowhead-marker';
 		if (!document.getElementById(markerId)) {
-			const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-			const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-			marker.setAttribute("id", markerId);
-			marker.setAttribute("markerWidth", "6");
-			marker.setAttribute("markerHeight", "6");
-			marker.setAttribute("viewBox", "0 0 6 6");
-			marker.setAttribute("refX", "5");
-			marker.setAttribute("refY", "3");
-			marker.setAttribute("orient", "auto");
-			marker.setAttribute("markerUnits", "strokeWidth");
+			const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+			const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+			marker.setAttribute('id', markerId);
+			marker.setAttribute('markerWidth', '6');
+			marker.setAttribute('markerHeight', '6');
+			marker.setAttribute('viewBox', '0 0 6 6');
+			marker.setAttribute('refX', '5');
+			marker.setAttribute('refY', '3');
+			marker.setAttribute('orient', 'auto');
+			marker.setAttribute('markerUnits', 'strokeWidth');
 
 			const pathElement = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"path"
+				'http://www.w3.org/2000/svg',
+				'path'
 			);
-			pathElement.setAttribute("d", "M0,0 L6,3 L0,6 Z");
-			pathElement.setAttribute("fill", "#b1b1b7");
-			pathElement.setAttribute("stroke", "none");
+			pathElement.setAttribute('d', 'M0,0 L6,3 L0,6 Z');
+			pathElement.setAttribute('fill', '#b1b1b7');
+			pathElement.setAttribute('stroke', 'none');
 
 			marker.appendChild(pathElement);
 			defs.appendChild(marker);
 
-			let svg = document.querySelector("svg");
+			let svg = document.querySelector('svg');
 			if (!svg) {
-				svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-				svg.setAttribute("style", "position:absolute; width:0; height:0;");
+				svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+				svg.setAttribute('style', 'position:absolute; width:0; height:0;');
 				document.body.appendChild(svg);
 			}
 			svg.appendChild(defs);
@@ -115,7 +118,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	useLayoutEffect(() => {
 		if (isEditing && textareaRef.current) {
 			const textarea = textareaRef.current;
-			textarea.style.height = "auto";
+			textarea.style.height = 'auto';
 			textarea.style.height = `${textarea.scrollHeight}px`;
 
 			setLabelDimensions(() => ({
@@ -149,7 +152,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-			if (event.key === "Enter" && !event.shiftKey) {
+			if (event.key === 'Enter' && !event.shiftKey) {
 				event.preventDefault();
 				setIsEditing(false);
 			}
@@ -169,23 +172,25 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 		[edge, selectedEdgeId, setSelectedEdgeId]
 	);
 
+	const handleKeyDownDelete = useCallback((event: KeyboardEvent) => {
+		if (isSelected && (event.key === 'Delete' || event.key === 'Backspace') && edge && !isEditing) {
+			onDeleteEdge?.(edge.id);
+			setSelectedEdgeId(null);
+		}
+	}, [isSelected, edge, onDeleteEdge, setSelectedEdgeId, isEditing]);
+
 	useEffect(() => {
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (isSelected && (event.key === "Delete" || event.key === "Backspace") && edge && !isEditing) {
-				onDeleteEdge?.(edge.id);
-				setSelectedEdgeId(null);
-			}
-		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [isSelected, edge, onDeleteEdge, setSelectedEdgeId]);
+
+		window.addEventListener('keydown', handleKeyDownDelete);
+		return () => window.removeEventListener('keydown', handleKeyDownDelete);
+	}, [isSelected, edge, onDeleteEdge, setSelectedEdgeId, isEditing, handleKeyDownDelete]);
 
 	let sourceX, sourceY, targetX, targetY;
 
 	if (edge && nodes) {
 		const sourceNode = nodes.find((n) => n.id === edge.source);
 		const targetNode = nodes.find((n) => n.id === edge.target);
-		if (!sourceNode || !targetNode) return null;
+		if (!sourceNode || !targetNode) {return null;}
 
 		sourceX = sourceNode.position.x + sourceNode.width / 2;
 		sourceY = sourceNode.position.y + sourceNode.height;
@@ -205,7 +210,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	const calculatePathData = () => {
 		if (isSelfConnection && edge) {
 			const node = nodes?.find((n) => n.id === edge.source);
-			if (!node) return { pathData: "", labelX: 0, labelY: 0 };
+			if (!node) {return { pathData: '', labelX: 0, labelY: 0 };}
 
 			const RADIUS_SCALE_X = 0.4;
 			const RADIUS_SCALE_Y = 0.9;
@@ -244,120 +249,120 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	const { pathData, labelX, labelY } = calculatePathData();
 
 	const svgStyle: React.CSSProperties = {
-		position: "absolute",
+		position: 'absolute',
 		left: 0,
 		top: 0,
-		width: "100%",
-		height: "100%",
-		pointerEvents: "none",
+		width: '100%',
+		height: '100%',
+		pointerEvents: 'none',
 		zIndex: isSelfConnection ? 2 : 1,
 	};
 
 	return (
-		<svg style={svgStyle} xmlns="http://www.w3.org/2000/svg" className="edge-container">
-			{/* Invisible hitbox for selection */}
+		<svg style={ svgStyle } xmlns="http://www.w3.org/2000/svg" className="edge-container">
+			{ /* Invisible hitbox for selection */ }
 			<path
-				d={pathData}
+				d={ pathData }
 				stroke="transparent"
-				strokeWidth={10}
+				strokeWidth={ 10 }
 				fill="none"
-				style={{ pointerEvents: "stroke", cursor: "pointer" }}
-				onClick={handleEdgeClick}
+				style={ { pointerEvents: 'stroke', cursor: 'pointer' } }
+				onClick={ handleEdgeClick }
 			/>
 
-			 {/* Highlight edge when selected */}
+			 { /* Highlight edge when selected */ }
 			<path
-				d={pathData}
-				stroke={isSelected ? "#ff5c5c" : "#b1b1b7"}
-				strokeWidth={2}
+				d={ pathData }
+				stroke={ isSelected ? '#ff5c5c' : '#b1b1b7' }
+				strokeWidth={ 2 }
 				fill="none"
 				markerEnd="url(#arrowhead-marker)"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				style={{ cursor: isSelected ? "pointer" : "default" }}
+				style={ { cursor: isSelected ? 'pointer' : 'default' } }
 			/>
 
-			{/* Edge Label */}
-			{label && (
+			{ /* Edge Label */ }
+			{ label && (
 				<g
-					style={{ pointerEvents: "auto" }}
-					transform={`translate(${labelX}, ${labelY})`}
-					onClick={(e) => {
+					style={ { pointerEvents: 'auto' } }
+					transform={ `translate(${labelX}, ${labelY})` }
+					onClick={ (e) => {
 						handleEdgeClick(e);
 						handleLabelClick(e);
-					}}
+					} }
 					role="button"
-					tabIndex={0}
+					tabIndex={ 0 }
 				>
 					<rect
-						x={-labelDimensions.width / 2 - LABEL_PADDING}
-						y={-labelDimensions.height / 2 - LABEL_PADDING}
-						width={labelDimensions.width + LABEL_PADDING * 2}
-						height={labelDimensions.height + LABEL_PADDING * 2}
+						x={ -labelDimensions.width / 2 - LABEL_PADDING }
+						y={ -labelDimensions.height / 2 - LABEL_PADDING }
+						width={ labelDimensions.width + LABEL_PADDING * 2 }
+						height={ labelDimensions.height + LABEL_PADDING * 2 }
 						fill="rgba(255, 255, 255, 0.9)"
 						rx="6"
 						ry="6"
-						stroke={isSelected ? "#ff5c5c" : "#b1b1b7"}
+						stroke={ isSelected ? '#ff5c5c' : '#b1b1b7' }
 						strokeWidth="1"
 					/>
-					{!isEditing && (
+					{ !isEditing && (
 						<text
-							ref={textRef}
+							ref={ textRef }
 							textAnchor="middle"
 							alignmentBaseline="middle"
-							style={{
-								fontSize: "14px",
-								fontFamily: "Arial, sans-serif",
-								fontWeight: "600",
-								fill: "#333",
-								cursor: "pointer",
-								userSelect: "none",
-								overflow: "hidden",
-								textOverflow: "ellipsis",
-								whiteSpace: "nowrap",
-							}}
+							style={ {
+								fontSize: '14px',
+								fontFamily: 'Arial, sans-serif',
+								fontWeight: '600',
+								fill: '#333',
+								cursor: 'pointer',
+								userSelect: 'none',
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								whiteSpace: 'nowrap',
+							} }
 						>
-							{label}
+							{ label }
 						</text>
-					)}
-					{isEditing && (
+					) }
+					{ isEditing && (
 						<foreignObject
-							x={-labelDimensions.width / 2 - LABEL_PADDING}
-							y={-labelDimensions.height / 2 - LABEL_PADDING}
-							width={labelDimensions.width + LABEL_PADDING * 2}
-							height={labelDimensions.height + LABEL_PADDING * 2}
+							x={ -labelDimensions.width / 2 - LABEL_PADDING }
+							y={ -labelDimensions.height / 2 - LABEL_PADDING }
+							width={ labelDimensions.width + LABEL_PADDING * 2 }
+							height={ labelDimensions.height + LABEL_PADDING * 2 }
 						>
 							<textarea
-								ref={textareaRef}
-								value={label}
-								onChange={handleLabelChange}
-								onBlur={handleBlur}
-								onKeyDown={handleKeyDown}
+								ref={ textareaRef }
+								value={ label }
+								onChange={ handleLabelChange }
+								onBlur={ handleBlur }
+								onKeyDown={ handleKeyDown }
 								autoFocus
 								placeholder="Transition label"
-								style={{
-									width: "100%",
-									height: "100%",
-									boxSizing: "border-box",
-									fontSize: "14px",
-									fontFamily: "Arial, sans-serif",
-									fontWeight: "600",
-									textAlign: "center",
-									border: "none",
-									backgroundColor: "transparent",
-									resize: "none",
-									overflow: "hidden",
-									outline: "none",
-									padding: "0",
-									margin: "0",
-									whiteSpace: "pre-wrap",
-									wordBreak: "break-all",
-								}}
+								style={ {
+									width: '100%',
+									height: '100%',
+									boxSizing: 'border-box',
+									fontSize: '14px',
+									fontFamily: 'Arial, sans-serif',
+									fontWeight: '600',
+									textAlign: 'center',
+									border: 'none',
+									backgroundColor: 'transparent',
+									resize: 'none',
+									overflow: 'hidden',
+									outline: 'none',
+									padding: '0',
+									margin: '0',
+									whiteSpace: 'pre-wrap',
+									wordBreak: 'break-all',
+								} }
 							/>
 						</foreignObject>
-					)}
+					) }
 				</g>
-			)}
+			) }
 		</svg>
 	);
 };

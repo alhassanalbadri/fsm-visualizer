@@ -1,16 +1,20 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 
 interface CustomNodeProps {
 	id: string;
 	data: {
-		isEditing: boolean; label?: string; conflictType?: string; conflictToken?: string 
+		isEditing: boolean; label?: string; conflictType?: string; conflictToken?: string
 };
 	isConnectable: boolean;
 	selected: boolean;
 	onSelect?: (id: string) => void;
 	onConnectStart?: (
 		nodeId: string,
-		portType: "input" | "output",
+		portType: 'input' | 'output',
 		portX: number,
 		portY: number,
 		clientX: number,
@@ -38,7 +42,7 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 		onLabelChange,
 	}) => {
 		const [label, setLabel] = useState<string>(
-			typeof data.label === "string" ? data.label : "New State"
+			typeof data.label === 'string' ? data.label : 'New State'
 		);
 		const [isEditing, setIsEditing] = useState(false);
 		const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
@@ -64,12 +68,12 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 
 		const updateDimensions = useCallback(() => {
 			if (!hiddenTextRef.current || !containerRef.current) {
-				console.warn("Hidden text or container reference is missing");
+				console.warn('Hidden text or container reference is missing');
 				return;
 			}
 
 			hiddenTextRef.current.textContent = isEditing
-				? textAreaRef.current?.value ?? ""
+				? textAreaRef.current?.value ?? ''
 				: label;
 
 			const contentWidth = hiddenTextRef.current.offsetWidth;
@@ -97,7 +101,7 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 
 
 		useEffect(() => {
-			setLabel(typeof data.label === "string" ? data.label : "New State");
+			setLabel(typeof data.label === 'string' ? data.label : 'New State');
 			updateDimensions();
 		}, [data.label]);
 
@@ -109,6 +113,7 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 		}, [label]);
 
 		useEffect(() => {
+			// eslint-disable-next-line no-param-reassign
 			data.isEditing = isEditing;
 			if (isEditing && textAreaRef.current) {
 				textAreaRef.current.focus();
@@ -168,7 +173,7 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 					const clientY = event.clientY;
 
 					// Call the onConnectStart callback with port and cursor positions
-					onConnectStart?.(id, "output", portX, portY, clientX, clientY);
+					onConnectStart?.(id, 'output', portX, portY, clientX, clientY);
 				}
 			},
 			[id, onConnectStart]
@@ -176,9 +181,9 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 
 		const handleKeyDown = useCallback(
 			(event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-				if (event.key === "Escape") {
+				if (event.key === 'Escape') {
 					setIsEditing(false);
-				} else if (event.key === "Enter" && !event.shiftKey) {
+				} else if (event.key === 'Enter' && !event.shiftKey) {
 					event.preventDefault();
 					setIsEditing(false);
 					onLabelChange?.(id, label.trim());
@@ -186,32 +191,32 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 			},
 			[id, label, onLabelChange]
 		);
-		
+
 
 		return (
 			<div
-				ref={containerRef}
-				className={`node-container px-4 py-2 rounded-lg relative flex flex-col justify-center items-center ${isEditing
-					? "border-2 border-green-500 shadow-lg"
+				ref={ containerRef }
+				className={ `node-container px-4 py-2 rounded-lg relative flex flex-col justify-center items-center ${isEditing
+					? 'border-2 border-green-500 shadow-lg'
 					: selected
-						? "border-2 border-blue-500 shadow-lg animate-borderPulse"
-						: "border-2 border-gray-300"
-					} bg-white shadow-md transition-all duration-700 ease-in-out hover:shadow-xl cursor-pointer`}
-				style={{
+						? 'border-2 border-blue-500 shadow-lg animate-borderPulse'
+						: 'border-2 border-gray-300'
+				} bg-white shadow-md transition-all duration-700 ease-in-out hover:shadow-xl cursor-pointer` }
+				style={ {
 					width: dimensions.width,
 					height: dimensions.height,
-				}}
-				onClick={handleClick}
-				onDoubleClick={handleDoubleClick}
-				tabIndex={0}
+				} }
+				onClick={ handleClick }
+				onDoubleClick={ handleDoubleClick }
+				tabIndex={ 0 }
 				role="button"
-				aria-label={`Node: ${label}`}
+				aria-label={ `Node: ${label}` }
 				title="Double-click to edit"
 			>
-				{/* Editing Indicator Icon */}
-				{isEditing && (
+				{ /* Editing Indicator Icon */ }
+				{ isEditing && (
 					<div className="absolute top-1 right-1">
-						{/* Pencil Icon */}
+						{ /* Pencil Icon */ }
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							className="h-4 w-4 text-green-500"
@@ -222,114 +227,116 @@ const CustomNode: React.FC<CustomNodeProps> = React.memo(
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
-								strokeWidth={2}
+								strokeWidth={ 2 }
 								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"
 							/>
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
-								strokeWidth={2}
+								strokeWidth={ 2 }
 								d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
 							/>
 						</svg>
 					</div>
-				)}
+				) }
 
-				{/* Input Handle - Top-Center */}
-				{isConnectable && (
+				{ /* Input Handle - Top-Center */ }
+				{ isConnectable && (
 					<div
-						ref={inputHandleRef}
-						className={`handle handle-target absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 border-2 border-white rounded-full cursor-pointer ${isCreatingConnection && !isConnectionSource
-							? "bg-green-500 animate-pulse"
-							: "bg-blue-500"
-							}`}
-						onClick={(e) => {
+						ref={ inputHandleRef }
+						className={ `handle handle-target absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 border-2 border-white rounded-full cursor-pointer ${isCreatingConnection && !isConnectionSource
+							? 'bg-green-500 animate-pulse'
+							: 'bg-blue-500'
+						}` }
+						onClick={ (e) => {
 							e.stopPropagation();
 							handleInputPortClick();
-						}}
+						} }
 					/>
-				)}
+				) }
 
-				{/* Label Editing or Display */}
-				{isEditing ? (
+				{ /* Label Editing or Display */ }
+				{ isEditing ? (
 					<textarea
-						ref={textAreaRef}
-						value={label}
-						onChange={(event) => setLabel(event.target.value)}
-						onBlur={() => {
+						ref={ textAreaRef }
+						value={ label }
+						onChange={ (event) => setLabel(event.target.value) }
+						onBlur={ () => {
 							setIsEditing(false);
 							onLabelChange?.(id, label.trim());
-						}}
+						} }
 						className="w-full resize-none outline-none text-lg font-semibold text-center rounded"
-						style={{
-							overflow: "auto",
+						style={ {
+							overflow: 'auto',
 							maxHeight: `${MAX_CONTENT_HEIGHT}px`,
 							lineHeight: `${LINE_HEIGHT}px`,
-						}}
-						rows={MAX_ROWS}
-						onKeyDown={handleKeyDown}
+						} }
+						rows={ MAX_ROWS }
+						onKeyDown={ handleKeyDown }
 					/>
 				) : (
+					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
 						className="content w-full overflow-hidden text-lg font-semibold text-center whitespace-pre-wrap break-words cursor-pointer"
-						style={{
+						style={ {
 							maxHeight: `${MAX_CONTENT_HEIGHT}px`,
 							lineHeight: `${LINE_HEIGHT}px`,
-						}}
-						onClick={(e) => {
+						} }
+						onClick={ (e) => {
 							e.stopPropagation();
 							if (selected) {
 								setIsEditing(true);
 							} else {
 								onSelect?.(id);
 							}
-						}}
+						} }
 					>
-						{label}
-						{(data.conflictType || data.conflictToken) && (
+						{ label }
+						{ (data.conflictType || data.conflictToken) && (
 							<div className="mt-2 p-2 w-full bg-red-100 rounded-lg border border-red-300">
-								{data.conflictType && (
+								{ data.conflictType && (
 									<div className="text-sm text-red-800 font-medium">
-										<strong>Conflict Type:</strong> {data.conflictType}
+										<strong>Conflict Type:</strong> { data.conflictType }
 									</div>
-								)}
-								{data.conflictToken && (
+								) }
+								{ data.conflictToken && (
 									<div className="text-sm text-red-800 font-medium">
-										<strong>Conflict Token:</strong> {data.conflictToken}
+										<strong>Conflict Token:</strong> { data.conflictToken }
 									</div>
-								)}
+								) }
 							</div>
-						)}
+						) }
 					</div>
-				)}
+				) }
 
-				{/* Output Handle - Bottom-Center */}
-				{isConnectable && (
+				{ /* Output Handle - Bottom-Center */ }
+				{ isConnectable && (
+					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
-						ref={outputHandleRef}
-						className={`handle handle-source absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 border-2 border-white rounded-full cursor-pointer ${isConnectionSource ? "bg-red-500" : "bg-blue-500"
-							}`}
-						onClick={(e) => {
+						ref={ outputHandleRef }
+						className={ `handle handle-source absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 border-2 border-white rounded-full cursor-pointer ${isConnectionSource ? 'bg-red-500' : 'bg-blue-500'
+						}` }
+						onClick={ (e) => {
 							e.stopPropagation();
 							handleOutputPortClick(e);
-						}}
+						} }
 					/>
-				)}
+				) }
 
-				{/* Hidden Element for Calculating Width */}
+				{ /* Hidden Element for Calculating Width */ }
 				<div
-					ref={hiddenTextRef}
+					ref={ hiddenTextRef }
 					className="absolute left-0 top-0 invisible whitespace-pre-wrap break-words text-lg font-bold"
-					style={{
+					style={ {
 						padding: `${PADDING_Y / 2}px ${PADDING_X / 2}px`,
 						maxWidth: `${MAX_WIDTH - PADDING_X - BORDER_X}px`,
-					}}
+					} }
 				/>
 			</div>
 		);
 	}
 );
 
-CustomNode.displayName = "CustomNode";
+CustomNode.displayName = 'CustomNode';
 
 export default CustomNode;

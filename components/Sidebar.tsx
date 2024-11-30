@@ -1,23 +1,26 @@
-"use client";
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-param-reassign */
+'use client';
 
-import React from "react";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Github, Linkedin, Mail } from 'lucide-react';
+import React from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
 	Card,
 	CardHeader,
 	CardTitle,
 	CardContent,
 	CardDescription,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Github, Linkedin, Mail } from "lucide-react";
+} from '@/components/ui/tooltip';
 
 const Sidebar = ({
 	onParseGrammar,
@@ -34,8 +37,8 @@ const Sidebar = ({
 		event: React.DragEvent<HTMLButtonElement>,
 		nodeType: string
 	) => {
-		event.dataTransfer.setData("application/fsmflow", nodeType);
-		event.dataTransfer.effectAllowed = "move";
+		event.dataTransfer.setData('application/fsmflow', nodeType);
+		event.dataTransfer.effectAllowed = 'move';
 	};
 
 	return (
@@ -66,7 +69,7 @@ const Sidebar = ({
 											<Button
 												variant="outline"
 												className="w-full cursor-move"
-												onDragStart={(event) => onDragStart(event, "default")}
+												onDragStart={ (event) => onDragStart(event, 'default') }
 												draggable
 											>
 												Drag to Add State
@@ -91,21 +94,21 @@ const Sidebar = ({
 							<CardContent>
 								<Textarea
 									placeholder="Enter grammar rules"
-									value={grammar}
-									onChange={(e) => onInputChange("grammar", e.target.value)}
+									value={ grammar }
+									onChange={ (e) => onInputChange('grammar', e.target.value) }
 									className="mb-3"
 								/>
-								<Button onClick={onParseGrammar} className="w-full">
+								<Button onClick={ onParseGrammar } className="w-full">
 									Parse Grammar
 								</Button>
-								{parsingResult && (
+								{ parsingResult && (
 									<div className="mt-4 p-3 bg-muted rounded-md">
 										<h3 className="text-sm font-semibold mb-2">Parsing Result</h3>
 										<pre className="text-xs whitespace-pre-wrap">
-											{parsingResult}
+											{ parsingResult }
 										</pre>
 									</div>
-								)}
+								) }
 							</CardContent>
 						</Card>
 					</TabsContent>
