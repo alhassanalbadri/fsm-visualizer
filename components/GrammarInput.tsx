@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface GrammarInputProps {
-	onParse: (grammarRules: string[]) => void;
+	onParse: (_grammarRules: string[]) => void;
 }
 
 const GrammarInput: React.FC<GrammarInputProps> = ({ onParse }) => {

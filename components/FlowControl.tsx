@@ -8,9 +8,9 @@ import { useToast } from '@/hooks/use-toast';
 
 interface StyledFlowControlsProps {
 	saveFlow: () => void;
-	onRestore: (flow: { nodes: any[], edges: any[] }) => void;
+	onRestore: (_flow: { nodes: any[], edges: any[] }) => void;
 	clearCanvas: () => void;
-	exportAsImage: (type: 'png' | 'svg') => void;
+	exportAsImage: (_type: 'png' | 'svg') => void;
 }
 
 export default function StyledFlowControls({ saveFlow, onRestore, clearCanvas, exportAsImage }: StyledFlowControlsProps) {

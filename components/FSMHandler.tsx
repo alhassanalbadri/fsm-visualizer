@@ -36,7 +36,7 @@ interface Edge {
 	type: string;
 	data: {
 		label: string;
-		onLabelChange: (id: string, newLabel: string) => void;
+		onLabelChange: (_id: string, _newLabel: string) => void;
 	};
 }
 

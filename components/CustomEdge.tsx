@@ -19,7 +19,7 @@ interface Edge {
 	type: string;
 	data: {
 		label: string;
-		onLabelChange: (id: string, newLabel: string) => void;
+		onLabelChange: (_id: string, _newLabel: string) => void;
 	};
 }
 
@@ -32,8 +32,8 @@ interface CustomEdgeProps {
 		targetY: number;
 	};
 	nodes?: Node[];
-	onDeleteEdge?: (id: string) => void;
-	setSelectedEdgeId: (id: string | null) => void;
+	onDeleteEdge?: (_id: string) => void;
+	setSelectedEdgeId: (_id: string | null) => void;
 	selectedEdgeId: string | null;
 }
 
@@ -162,7 +162,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 			event.stopPropagation();
 			if (edge?.id !== selectedEdgeId) {
 				setSelectedEdgeId(edge?.id || null);
-			} else if(edge?.id === selectedEdgeId) {
+			} else if (edge?.id === selectedEdgeId) {
 				setSelectedEdgeId(null);
 			}
 		},
@@ -187,7 +187,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	if (edge && nodes) {
 		const sourceNode = nodes.find((n) => n.id === edge.source);
 		const targetNode = nodes.find((n) => n.id === edge.target);
-		if (!sourceNode || !targetNode) {return null;}
+		if (!sourceNode || !targetNode) { return null; }
 
 		sourceX = sourceNode.position.x + sourceNode.width / 2;
 		sourceY = sourceNode.position.y + sourceNode.height;
@@ -207,7 +207,7 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	const calculatePathData = () => {
 		if (isSelfConnection && edge) {
 			const node = nodes?.find((n) => n.id === edge.source);
-			if (!node) {return { pathData: '', labelX: 0, labelY: 0 };}
+			if (!node) { return { pathData: '', labelX: 0, labelY: 0 }; }
 
 			const RADIUS_SCALE_X = 0.4;
 			const RADIUS_SCALE_Y = 0.9;
@@ -256,58 +256,58 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	};
 
 	return (
-		<svg style={ svgStyle } xmlns="http://www.w3.org/2000/svg" className="edge-container">
-			{ /* Invisible hitbox for selection */ }
+		<svg style={svgStyle} xmlns="http://www.w3.org/2000/svg" className="edge-container">
+			{ /* Invisible hitbox for selection */}
 			<path
-				d={ pathData }
+				d={pathData}
 				stroke="transparent"
-				strokeWidth={ 10 }
+				strokeWidth={10}
 				fill="none"
-				style={ { pointerEvents: 'stroke', cursor: 'pointer' } }
-				onClick={ handleEdgeClick }
+				style={{ pointerEvents: 'stroke', cursor: 'pointer' }}
+				onClick={handleEdgeClick}
 			/>
 
-			 { /* Highlight edge when selected */ }
+			{ /* Highlight edge when selected */}
 			<path
-				d={ pathData }
-				stroke={ isSelected ? '#ff5c5c' : '#b1b1b7' }
-				strokeWidth={ 2 }
+				d={pathData}
+				stroke={isSelected ? '#ff5c5c' : '#b1b1b7'}
+				strokeWidth={2}
 				fill="none"
 				markerEnd="url(#arrowhead-marker)"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				style={ { cursor: isSelected ? 'pointer' : 'default' } }
+				style={{ cursor: isSelected ? 'pointer' : 'default' }}
 			/>
 
-			{ /* Edge Label */ }
-			{ label && (
+			{ /* Edge Label */}
+			{label && (
 				<g
-					style={ { pointerEvents: 'auto' } }
-					transform={ `translate(${labelX}, ${labelY})` }
-					onClick={ (e) => {
+					style={{ pointerEvents: 'auto' }}
+					transform={`translate(${labelX}, ${labelY})`}
+					onClick={(e) => {
 						handleEdgeClick(e);
 						handleLabelClick(e);
-					} }
+					}}
 					role="button"
-					tabIndex={ 0 }
+					tabIndex={0}
 				>
 					<rect
-						x={ -labelDimensions.width / 2 - LABEL_PADDING }
-						y={ -labelDimensions.height / 2 - LABEL_PADDING }
-						width={ labelDimensions.width + LABEL_PADDING * 2 }
-						height={ labelDimensions.height + LABEL_PADDING * 2 }
+						x={-labelDimensions.width / 2 - LABEL_PADDING}
+						y={-labelDimensions.height / 2 - LABEL_PADDING}
+						width={labelDimensions.width + LABEL_PADDING * 2}
+						height={labelDimensions.height + LABEL_PADDING * 2}
 						fill="rgba(255, 255, 255, 0.9)"
 						rx="6"
 						ry="6"
-						stroke={ isSelected ? '#ff5c5c' : '#b1b1b7' }
+						stroke={isSelected ? '#ff5c5c' : '#b1b1b7'}
 						strokeWidth="1"
 					/>
-					{ !isEditing && (
+					{!isEditing && (
 						<text
-							ref={ textRef }
+							ref={textRef}
 							textAnchor="middle"
 							alignmentBaseline="middle"
-							style={ {
+							style={{
 								fontSize: '14px',
 								fontFamily: 'Arial, sans-serif',
 								fontWeight: '600',
@@ -317,27 +317,27 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
 								whiteSpace: 'nowrap',
-							} }
+							}}
 						>
-							{ label }
+							{label}
 						</text>
-					) }
-					{ isEditing && (
+					)}
+					{isEditing && (
 						<foreignObject
-							x={ -labelDimensions.width / 2 - LABEL_PADDING }
-							y={ -labelDimensions.height / 2 - LABEL_PADDING }
-							width={ labelDimensions.width + LABEL_PADDING * 2 }
-							height={ labelDimensions.height + LABEL_PADDING * 2 }
+							x={-labelDimensions.width / 2 - LABEL_PADDING}
+							y={-labelDimensions.height / 2 - LABEL_PADDING}
+							width={labelDimensions.width + LABEL_PADDING * 2}
+							height={labelDimensions.height + LABEL_PADDING * 2}
 						>
 							<textarea
-								ref={ textareaRef }
-								value={ label }
-								onChange={ handleLabelChange }
-								onBlur={ handleBlur }
-								onKeyDown={ handleKeyDown }
+								ref={textareaRef}
+								value={label}
+								onChange={handleLabelChange}
+								onBlur={handleBlur}
+								onKeyDown={handleKeyDown}
 								autoFocus
 								placeholder="Transition label"
-								style={ {
+								style={{
 									width: '100%',
 									height: '100%',
 									boxSizing: 'border-box',
@@ -354,12 +354,12 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 									margin: '0',
 									whiteSpace: 'pre-wrap',
 									wordBreak: 'break-all',
-								} }
+								}}
 							/>
 						</foreignObject>
-					) }
+					)}
 				</g>
-			) }
+			)}
 		</svg>
 	);
 };
