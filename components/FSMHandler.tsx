@@ -98,6 +98,12 @@ const FlowEditor = () => {
 	const [isSaved, setIsSaved] = useState<boolean>(true);
 	const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
 
+	// Panning & Zooming
+	const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+	const [isPanning, setIsPanning] = useState<boolean>(false);
+	const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
+	const [zoom, setZoom] = useState(1);
+
 	// Update refs when state changes
 	useEffect(() => {
 		selectedNodeRef.current = selectedNode;
@@ -107,10 +113,29 @@ const FlowEditor = () => {
 		dragOffsetRef.current = dragOffset;
 	}, [dragOffset]);
 
-	// STATE VARIABLES FOR PANNING
-	const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-	const [isPanning, setIsPanning] = useState<boolean>(false);
-	const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
+	const handleWheelZoom = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+		e.preventDefault();
+
+		const zoomChange = e.deltaY * -0.001; // Zoom sensitivity
+		const newZoom = Math.min(Math.max(zoom + zoomChange, 0.5), 2); // Clamp zoom between 0.5 and 2
+
+		const canvasRect = exportRef.current?.getBoundingClientRect();
+		if (!canvasRect) return;
+
+		// Cursor position relative to the canvas
+		const cursorX = e.clientX - canvasRect.left;
+		const cursorY = e.clientY - canvasRect.top;
+
+		// Calculate the new offset to keep the cursor position fixed
+		const scaleDiff = newZoom / zoom;
+		const newOffsetX = panOffset.x - (cursorX * (scaleDiff - 1));
+		const newOffsetY = panOffset.y - (cursorY * (scaleDiff - 1));
+
+		setPanOffset({ x: newOffsetX, y: newOffsetY });
+		setZoom(newZoom);
+	}, [zoom, panOffset]);
+
+
 
 	const handleCanvasMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 		if (e.button === 0 && !isDraggingRef.current) {
@@ -168,8 +193,8 @@ const FlowEditor = () => {
 			let newY = event.clientY - offset.offsetY;
 
 			// Ensure the node stays within the canvas boundaries
-			newX = Math.max(0, Math.min(newX, CANVAS_WIDTH - NODE_WIDTH)); // NODE_WIDTH is the width of the node
-			newY = Math.max(0, Math.min(newY, CANVAS_HEIGHT - NODE_HEIGHT)); // NODE_HEIGHT is the height of the node
+			newX = Math.max(0, Math.min(newX, CANVAS_WIDTH - NODE_WIDTH));
+			newY = Math.max(0, Math.min(newY, CANVAS_HEIGHT - NODE_HEIGHT));
 
 			setNodes((prevNodes) =>
 				prevNodes.map((node) =>
@@ -757,34 +782,38 @@ const FlowEditor = () => {
 	return (
 		<div className="flex h-screen">
 			<Sidebar
-				onInputChange={ handleInputChange }
-				onParseGrammar={ handleParseGrammar }
-				grammar={ grammar }
-				parsingResult={ parsingResult }
+				onInputChange={handleInputChange}
+				onParseGrammar={handleParseGrammar}
+				grammar={grammar}
+				parsingResult={parsingResult}
 			/>
 			<div
-				className={ `flex-grow relative bg-gray-100 overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-default'
-				}` }
-				onClick={ handleCanvasClick }
-				onMouseMove={ handleCanvasMouseMove }
-				onDragOver={ onDragOver }
-				onDrop={ onDrop }
-				onMouseDown={ handleCanvasMouseDown }
+				className={`flex-grow relative bg-gray-100 overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-default'
+					}`}
+				onClick={handleCanvasClick}
+				onMouseMove={handleCanvasMouseMove}
+				onDragOver={onDragOver}
+				onDrop={onDrop}
+				onMouseDown={handleCanvasMouseDown}
 			>
-				{ /* Inner Container for Panning with exportRef */ }
+
+				{ /* Inner Container for Panning with exportRef */}
 				<div
-					ref={ exportRef }
+					ref={exportRef}
 					className="absolute top-0 left-0 canvas-background"
-					style={ {
-						transform: `translate(${panOffset.x}px, ${panOffset.y}px)`,
+					onWheel={handleWheelZoom}
+					style={{
+						transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
+						transformOrigin: '0 0', // Ensure scaling is relative to the top-left corner						
 						width: `${CANVAS_WIDTH}px`,
 						height: `${CANVAS_HEIGHT}px`,
 						position: 'relative',
-					} }
+
+					}}
 				>
-					{ /* SVG Container for Edges */ }
+					{ /* SVG Container for Edges */}
 					<svg
-						style={ {
+						style={{
 							position: 'absolute',
 							top: 0,
 							left: 0,
@@ -792,7 +821,7 @@ const FlowEditor = () => {
 							height: '100%',
 							pointerEvents: 'none',
 							zIndex: 1,
-						} }
+						}}
 						xmlns="http://www.w3.org/2000/svg"
 					>
 						<defs>
@@ -808,20 +837,20 @@ const FlowEditor = () => {
 							</marker>
 						</defs>
 
-						{ /* Render Existing Edges */ }
-						{ edges.map((edge) => (
-							<CustomEdge key={ edge.id } edge={ edge } nodes={ nodes } selectedEdgeId={ selectedEdgeId } setSelectedEdgeId={ setSelectedEdgeId } onDeleteEdge={ onDeleteEdge } />
-						)) }
+						{ /* Render Existing Edges */}
+						{edges.map((edge) => (
+							<CustomEdge key={edge.id} edge={edge} nodes={nodes} selectedEdgeId={selectedEdgeId} setSelectedEdgeId={setSelectedEdgeId} onDeleteEdge={onDeleteEdge} />
+						))}
 
-						{ /* Render Dragged Edge */ }
-						{ draggedEdge && <CustomEdge path={ draggedEdge } selectedEdgeId={ selectedEdgeId } setSelectedEdgeId={ setSelectedEdgeId } onDeleteEdge={ onDeleteEdge } /> }
+						{ /* Render Dragged Edge */}
+						{draggedEdge && <CustomEdge path={draggedEdge} selectedEdgeId={selectedEdgeId} setSelectedEdgeId={setSelectedEdgeId} onDeleteEdge={onDeleteEdge} />}
 					</svg>
 
-					{ /* Render Nodes */ }
-					{ nodes.map((node) => (
+					{ /* Render Nodes */}
+					{nodes.map((node) => (
 						<button
-							key={ node.id }
-							style={ {
+							key={node.id}
+							style={{
 								position: 'absolute',
 								left: node.position.x,
 								top: node.position.y,
@@ -832,39 +861,39 @@ const FlowEditor = () => {
 								border: 'none',
 								background: 'transparent',
 								padding: 0,
-							} }
-							onMouseDown={ (event) => handleNodeDragStart(event, node.id) }
-							onKeyDown={ (event) => {
+							}}
+							onMouseDown={(event) => handleNodeDragStart(event, node.id)}
+							onKeyDown={(event) => {
 								if (event.key === 'Enter' || event.key === ' ') {
 									event.preventDefault();
 									handleNodeDragStart(event as unknown as React.MouseEvent, node.id);
 								}
-							} }
-							aria-label={ `Draggable node: ${node.data.label}` }
+							}}
+							aria-label={`Draggable node: ${node.data.label}`}
 						>
 							<CustomNode
-								id={ node.id }
-								data={ node.data }
+								id={node.id}
+								data={node.data}
 								isConnectable
-								selected={ selectedNode === node.id }
-								onSelect={ handleSelectNode }
-								onConnectStart={ handleConnectionStart }
-								onConnectEnd={ handleConnectionEnd }
-								isCreatingConnection={ !!connectionStart }
-								isConnectionSource={ connectionStart?.nodeId === node.id }
-								onResize={ handleNodeResize }
-								onLabelChange={ handleNodeLabelChange }
+								selected={selectedNode === node.id}
+								onSelect={handleSelectNode}
+								onConnectStart={handleConnectionStart}
+								onConnectEnd={handleConnectionEnd}
+								isCreatingConnection={!!connectionStart}
+								isConnectionSource={connectionStart?.nodeId === node.id}
+								onResize={handleNodeResize}
+								onLabelChange={handleNodeLabelChange}
 							/>
 						</button>
-					)) }
+					))}
 				</div>
 
-				{ /* Controls */ }
+				{/* Controls */}
 				<FlowControl
-					saveFlow={ saveFlow }
-					clearCanvas={ clearCanvas }
-					exportAsImage={ exportAsImage }
-					onRestore={ onRestore }
+					saveFlow={saveFlow}
+					clearCanvas={clearCanvas}
+					exportAsImage={exportAsImage}
+					onRestore={onRestore}
 				/>
 			</div>
 		</div>
