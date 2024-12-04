@@ -863,12 +863,6 @@ const FlowEditor = () => {
 								padding: 0,
 							}}
 							onMouseDown={(event) => handleNodeDragStart(event, node.id)}
-							onKeyDown={(event) => {
-								if (event.key === 'Enter' || event.key === ' ') {
-									event.preventDefault();
-									handleNodeDragStart(event as unknown as React.MouseEvent, node.id);
-								}
-							}}
 							aria-label={`Draggable node: ${node.data.label}`}
 						>
 							<CustomNode

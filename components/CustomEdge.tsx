@@ -177,7 +177,6 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 	}, [isSelected, edge, onDeleteEdge, setSelectedEdgeId, isEditing]);
 
 	useEffect(() => {
-
 		window.addEventListener('keydown', handleKeyDownDelete);
 		return () => window.removeEventListener('keydown', handleKeyDownDelete);
 	}, [isSelected, edge, onDeleteEdge, setSelectedEdgeId, isEditing, handleKeyDownDelete]);
@@ -199,6 +198,10 @@ const CustomEdge: React.FC<CustomEdgeProps> = ({
 		targetX = path.targetX;
 		targetY = path.targetY;
 	} else {
+		return null;
+	}
+
+	if(!sourceX || !sourceY || !targetX || !targetY) {
 		return null;
 	}
 
